@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IW01</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #222;
+      background-image: url('../Backgrounds/dockside.jpg');
+      height: 25%;
+      width: 25%;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    #fade-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    #textbox {
+      position: relative;
+      width: 95%;
+      max-width: 800px;
+      margin-bottom: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    #portrait {
+      width: 180px;
+      height: 180px;
+      background-color: #111;
+      margin-right: 15px;
+      border-radius: 10px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    #char-name {
+      position: absolute;
+      top: -30px;
+      left: 0;
+      background: #000;
+      padding: 5px 10px;
+      border-radius: 8px 8px 0 0;
+      font-weight: bold;
+    }
+
+    #text-content {
+      flex: 1;
+      position: relative;
+    }
+
+    #click-hint {
+      font-size: 0.8em;
+      color: #aaa;
+      margin-top: 10px;
+      display: none;
+    }
+
+    #chapter-box {
+      position: absolute;
+      top: 20px;
+      left: -300px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      border-radius: 0 10px 10px 0;
+      transition: left 0.5s ease-in-out;
+      z-index: 10;
+    }
+
+    #chapter-box.show {
+      left: 20px;
+    }
+
+    #title-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      border-radius: 10px;
+      z-index: 10;
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 600px) {
+      #textbox {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #portrait {
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+
+      #char-name {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="fade-overlay"></div>
+  <div id="chapter-box" style="display: none;"></div>
+  <div id="title-box">CHAPTER S7VN-10<br>
+  Entering Neo-Essurarlands<br>
+  August 29, 2012
+  </div>
+  <div id="game-container">
+    <div id="textbox">
+      <div id="portrait">
+        <div id="char-name"></div>
+      </div>
+      <div id="text-content">
+        <div id="dialogue-text"></div>
+        <div id="click-hint">(Click anywhere in this box to continue...)</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* this is the base. if you dont put character name and portrait the engine will interpret it as narrator
+      {
+        character: '',
+        portrait: '',
+        text: ``,
+      },
+    */
+    const scenes = [
+      {
+        character: '',
+        portrait: '',
+        text: `The ship continues to sail from Kyoshin to Neo-Essurarlands.`,
+      },
+      {
+        character: '',
+        portrait: '',
+        text: `Kaden was boarding the ship along with Kurt.`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `Kaden looked at the window outside. He saw nothing but the ocean. "Are we there?" He asked, his eyes slowly closing.`,
+      },
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `Kurt, half-asleep, turned to Kaden. "Hm, looks like it."`,
+      },
+      {
+        character: '',
+        portrait: '',
+        text: `The ship's horn sounded, multiple passengers hurried to get out of the ship to reunite with their families. But the crew got out, dreading the sight of Neo-Essurarlands.`,
+      },
+      {
+        character: 'Noah',
+        portrait: 'noah.png',
+        text: `"...?" Noah looked out the window of the Dockside Diner, spotting Kaden and Noah off the ship.
+        "Send in Charlie, They have arrived." He said through his intercoms.`,
+      },
+      {
+        character: 'Ava',
+        portrait: 'ava.png',
+        text: `"Affirmative, sending in Charlie near the Dockside Diner." Ava replied, the slight static from the radios muffling her voice.`,
+      },     
+      {
+        character: 'Charlie',
+        portrait: 'charlie.png',
+        text: `Charlie's car could be heard through her intercoms. "On my way."`,
+      },      
+      {
+        character: 'Sophia',
+        portrait: 'sophia.png',
+        text: `Sophia yawned, stepping out of her cabin. "Are we here?"`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"Yes, we are. Your crewmates should be waiting for us outside." Kaden said, grabbing his luggage as he was first to step out.
+        "Try not to forget anything."`,
+      },      
+      {
+        character: '',
+        portrait: '',
+        text: `The crew met outside the Dockside Diner, chatted a bit. But Kaden just looked at the departing ship as it returned to the sea of Kyoshin.`,
+      },
+      {
+        character: 'Sophia',
+        portrait: 'sophia.png',
+        text: `Sophia snapped her fingers in front of Kaden, grabbing his attention. "Hey, you still remember where the hideout's address is?"`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"A-ah, right. It's at Nova Crescent, at the ground floor of the apartment." Kaden said, breaking out of his trance.`,
+      },      
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `Kurt smirked, finding Kaden and Sophia's conversation interesting. "Hey, I knew he'd be useful, He's single too!"`,
+      },    
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"Behave yourself. This is not a part of the contract." Kaden stated, glaring at Kurt. "I will only do the important things first."`,
+      },      
+    ];            
+
+    let index = 0;
+    const charName = document.getElementById('char-name');
+    const portrait = document.getElementById('portrait');
+    const dialogue = document.getElementById('dialogue-text');
+    const clickHint = document.getElementById('click-hint');
+    const fadeOverlay = document.getElementById('fade-overlay');
+
+    function showScene(i) {
+      const scene = scenes[i];
+
+      dialogue.innerHTML = scene.text;
+      clickHint.style.display = i === 0 ? 'block' : 'none';
+
+      // Hide portrait & name if both are empty
+      if (!scene.character && !scene.portrait) {
+        portrait.style.display = 'none';
+      } else {
+        portrait.style.display = 'block';
+        charName.textContent = scene.character;
+        portrait.style.backgroundImage = scene.portrait
+          ? `url('../Characters/${scene.portrait}')`
+          : 'none';
+      }
+    }
+
+    document.getElementById('textbox').addEventListener('click', () => {
+      index++;
+      if (index < scenes.length) {
+        showScene(index);
+      } else {
+        fadeOverlay.style.opacity = 1;
+        setTimeout(() => {
+          window.location.href = 'C1S2.html';
+        }, 800);
+      }
+    });
+
+    window.addEventListener('load', () => {
+      fadeOverlay.style.opacity = 0;
+    });
+
+    const chapterBox = document.getElementById('chapter-box');
+    chapterBox.classList.add('show');
+    setTimeout(() => {
+      chapterBox.classList.remove('show');
+    }, 3000);
+
+    showScene(index);
+  </script>
+</body>
+</html>
