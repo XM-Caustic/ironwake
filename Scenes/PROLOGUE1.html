@@ -8,12 +8,9 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('../../Backgrounds/carnight.jpg');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      height: 100%;
-      width: 100%;
+      background-image: url('../../Backgrounds/dockside.jpg');
+      height: 25%;
+      width: 25%;
       color: #fff;
       font-family: Arial, sans-serif;
       overflow: hidden;
@@ -63,16 +60,7 @@
       border-radius: 10px;
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
       position: relative;
-    }
-
-    /* Compact style if only name is shown */
-    #portrait.name-only {
-      width: auto;
-      height: auto;
-      background: none;
-      margin-right: 15px;
     }
 
     #char-name {
@@ -83,13 +71,6 @@
       padding: 5px 10px;
       border-radius: 8px 8px 0 0;
       font-weight: bold;
-    }
-
-    #portrait.name-only #char-name {
-      position: static;
-      border-radius: 8px;
-      top: auto;
-      left: auto;
     }
 
     #text-content {
@@ -151,9 +132,10 @@
 </head>
 <body>
   <div id="fade-overlay"></div>
-  <div id="title-box">Chapter 1 - 1<br>
-    SE7EN<br>
-    August 29, 2012
+  <div id="chapter-box" style="display: none;"></div>
+  <div id="title-box">CHAPTER S7VN-10<br>
+  Entering Neo-Essurarlands<br>
+  August 29, 2012
   </div>
   <div id="game-container">
     <div id="textbox">
@@ -168,26 +150,92 @@
   </div>
 
   <script>
+    /* this is the base. if you dont put character name and portrait the engine will interpret it as narrator
+      {
+        character: '',
+        portrait: '',
+        text: ``,
+      },
+    */
     const scenes = [
       {
         character: '',
         portrait: '',
-        text: `Charlie is driving the crew to their hideout, she breaks the silence.`,
+        text: `The ship continues to sail from Kyoshin to Neo-Essurarlands.`,
       },
+      {
+        character: '',
+        portrait: '',
+        text: `Kaden was boarding the ship along with Kurt.`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `Kaden looked at the window outside. He saw nothing but the ocean. "Are we there?" He asked, his eyes slowly closing.`,
+      },
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `Kurt, half-asleep, turned to Kaden. "Hm, looks like it."`,
+      },
+      {
+        character: '',
+        portrait: '',
+        text: `The ship's horn sounded, multiple passengers hurried to get out of the ship to reunite with their families. But the crew got out, dreading the sight of Neo-Essurarlands.`,
+      },
+      {
+        character: 'Noah',
+        portrait: 'noah.png',
+        text: `"...?" Noah looked out the window of the Dockside Diner, spotting Kaden and Noah off the ship.
+        "Send in Charlie, They have arrived." He said through his intercoms.`,
+      },
+      {
+        character: 'Ava',
+        portrait: 'ava.png',
+        text: `"Affirmative, sending in Charlie near the Dockside Diner." Ava replied, the slight static from the radios muffling her voice.`,
+      },     
       {
         character: 'Charlie',
         portrait: 'charlie.png',
-        text: '"So, has Kaden met the crew yet?" Charlie asked, attempting to break the awkward silence in their car.',
-      },
-      {
-        haracter: 'Kaden',
-        portrait: 'kaden.png',
-        text: '"...Not yet, but I`ve only met Kurt." Kaden replied, looking out the window.',
+        text: `Charlie's car could be heard through her intercoms. "On my way."`,
       },      
       {
-        character: 
-      }      
-    ];
+        character: 'Sophia',
+        portrait: 'sophia.png',
+        text: `Sophia yawned, stepping out of her cabin. "Are we here?"`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"Yes, we are. Your crewmates should be waiting for us outside." Kaden said, grabbing his luggage as he was first to step out.
+        "Try not to forget anything."`,
+      },      
+      {
+        character: '',
+        portrait: '',
+        text: `The crew met outside the Dockside Diner, chatted a bit. But Kaden just looked at the departing ship as it returned to the sea of Kyoshin.`,
+      },
+      {
+        character: 'Sophia',
+        portrait: 'sophia.png',
+        text: `Sophia snapped her fingers in front of Kaden, grabbing his attention. "Hey, you still remember where the hideout's address is?"`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"A-ah, right. It's at Nova Crescent, at the ground floor of the apartment." Kaden said, breaking out of his trance.`,
+      },      
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `Kurt smirked, finding Kaden and Sophia's conversation interesting. "Hey, I knew he'd be useful, He's single too!"`,
+      },    
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"Behave yourself. This is not a part of the contract." Kaden stated, glaring at Kurt. "I will only do the important things first."`,
+      },      
+    ];            
 
     let index = 0;
     const charName = document.getElementById('char-name');
@@ -198,28 +246,18 @@
 
     function showScene(i) {
       const scene = scenes[i];
+
       dialogue.innerHTML = scene.text;
       clickHint.style.display = i === 0 ? 'block' : 'none';
 
-      // Hide portrait & name if both empty
+      // Hide portrait & name if both are empty
       if (!scene.character && !scene.portrait) {
         portrait.style.display = 'none';
-        charName.textContent = '';
-      }
-      // Name but no portrait → compact name box
-      else if (scene.character && !scene.portrait) {
+      } else {
         portrait.style.display = 'block';
-        portrait.classList.add('name-only');
         charName.textContent = scene.character;
-        portrait.style.backgroundImage = 'none';
-      }
-      // Normal portrait + name
-      else {
-        portrait.style.display = 'block';
-        portrait.classList.remove('name-only');
-        charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('../../Characters/${scene.portrait}')`
+          ? `url('../Characters/${scene.portrait}')`
           : 'none';
       }
     }
@@ -231,7 +269,7 @@
       } else {
         fadeOverlay.style.opacity = 1;
         setTimeout(() => {
-          window.location.href = '../CHAPTER1/C1S1.html';
+          window.location.href = '../../Scenes/CHAPTER1/C1S1.html';
         }, 800);
       }
     });
@@ -239,6 +277,12 @@
     window.addEventListener('load', () => {
       fadeOverlay.style.opacity = 0;
     });
+
+    const chapterBox = document.getElementById('chapter-box');
+    chapterBox.classList.add('show');
+    setTimeout(() => {
+      chapterBox.classList.remove('show');
+    }, 3000);
 
     showScene(index);
   </script>
