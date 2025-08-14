@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Launcher</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: hsl(0, 0%, 0%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      background-color: hsl(0, 0%, 15%);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 80%;
+      margin: 10%;
+      text-align: center;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      border-radius: 6px;
+      padding: 15px 24px;
+      background-color: hsl(0, 5%, 10%);
+      color: white;
+      border: 0;
+      cursor: pointer;
+    }
+    #csShow {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>I R O N W A K E</h1>
+    <h3>v0.7</h3>
+    <a href="../Scenes/PROLOGUE1.html"><button>START IRONWAKE</button></a><br><br>
+    <button id="chapterBtn">Chapter Select</button>
+    <div id="csShow">
+      Chapter Select is not recommended unless you want to play <br>
+      for fun and not for the story. <br>
+      Playing the game from the start is recommended to know about the main story <br>
+      and to avoid spoilers. <br><br>
+
+      The chapters are only divided by the full chapter and doesn't include the parts. <br>
+      If you would like to play a specific part, select it from this extended list: <a href="">test</a> <br><br>
+
+      <hr>
+
+      ACT 1 <br><br>
+    
+      <a href="../../Scenes/PROLOGUE1.html"><button>PROLOGUE</button></a>
+      <a href="../../Scenes/C1S1.html"><button>CHAPTER 1</button></a>
+    </div>
+  </div>
+
+  <script>
+    const chapterBtn = document.getElementById('chapterBtn');
+    const csShow = document.getElementById('csShow');
+
+    chapterBtn.addEventListener('click', () => {
+      csShow.style.display = (csShow.style.display === 'none' || csShow.style.display === '') ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>
