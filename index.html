@@ -1,74 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Launcher</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background-color: hsl(0, 0%, 0%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .container {
-      background-color: hsl(0, 0%, 15%);
-      padding: 2rem;
-      border-radius: 12px;
-      max-width: 600px;
-      width: 80%;
-      margin: 10%;
-      text-align: center;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    button {
-      border-radius: 6px;
-      padding: 15px 24px;
-      background-color: hsl(0, 5%, 10%);
-      color: white;
-      border: 0;
-      cursor: pointer;
-    }
-    #csShow {
-      display: none;
-      margin-top: 10px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRONWAKE Preloader</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background-color: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  #introText {
+    opacity: 0;
+    max-width: 800px;
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    transition: opacity 2s ease-in-out;
+  }
+
+  #loading {
+    display: none;
+    font-size: 1.2rem;
+    animation: blink 1.5s infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  #continueBtn {
+    display: none;
+    padding: 10px 20px;
+    background-color: #222;
+    border: 2px solid #fff;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  #continueBtn:hover {
+    background-color: #fff;
+    color: #111;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>I R O N W A K E</h1>
-    <h3>v0.7</h3>
-    <a href="../Scenes/PROLOGUE1.html"><button>START IRONWAKE</button></a><br><br>
-    <button id="chapterBtn">Chapter Select</button>
-    <div id="csShow">
-      Chapter Select is not recommended unless you want to play <br>
-      for fun and not for the story. <br>
-      Playing the game from the start is recommended to know about the main story <br>
-      and to avoid spoilers. <br><br>
 
-      The chapters are only divided by the full chapter and doesn't include the parts. <br>
-      If you would like to play a specific part, select it from this extended list: <a href="">test</a> <br><br>
+<div id="introText">
+  IRONWAKE is a visual novel game with combat.<br><br>
+  The recommended play route is to play through the game chronologically via the <b>"START IRONWAKE"</b> button.<br><br>
+  This game does not have a save feature — it is recommended you remember your progress.<br><br>
+  The game's source code is available on GitHub.
+</div>
 
-      <hr>
+<div id="loading">Loading...</div>
+<button id="continueBtn" onclick="window.location.href='launcher.html'">Continue</button>
 
-      ACT 1 <br><br>
-    
-      <a href="../../Scenes/PROLOGUE1.html"><button>PROLOGUE</button></a>
-      <a href="../../Scenes/C1S1.html"><button>CHAPTER 1</button></a>
-    </div>
-  </div>
+<script>
+  const introText = document.getElementById('introText');
+  const loading = document.getElementById('loading');
+  const continueBtn = document.getElementById('continueBtn');
 
-  <script>
-    const chapterBtn = document.getElementById('chapterBtn');
-    const csShow = document.getElementById('csShow');
+  // Fade in intro text
+  setTimeout(() => {
+    introText.style.opacity = 1;
+  }, 500);
 
-    chapterBtn.addEventListener('click', () => {
-      csShow.style.display = (csShow.style.display === 'none' || csShow.style.display === '') ? 'block' : 'none';
-    });
-  </script>
+  // Fade out intro text after 6 seconds
+  setTimeout(() => {
+    introText.style.opacity = 0;
+  }, 6500);
+
+  // Show loading after fade-out
+  setTimeout(() => {
+    introText.style.display = 'none';
+    loading.style.display = 'block';
+  }, 8500);
+
+  // Show continue button after loading
+  setTimeout(() => {
+    loading.style.display = 'none';
+    continueBtn.style.display = 'block';
+  }, 12000);
+</script>
+
 </body>
 </html>

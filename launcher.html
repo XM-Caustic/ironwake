@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Launcher</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: hsl(0, 0%, 0%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    /* Loading screen */
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: hsl(0, 0%, 0%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #proceedBtn {
+      background-color: hsl(0, 5%, 10%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Launcher container */
+    .container {
+      background-color: hsl(0, 0%, 15%);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 80%;
+      margin: 10%;
+      text-align: center;
+      display: none;
+    }
+    button {
+      border-radius: 6px;
+      padding: 15px 24px;
+      background-color: hsl(0, 5%, 10%);
+      color: white;
+      border: 0;
+      cursor: pointer;
+    }
+    #csShow {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Hidden audio -->
+  <audio id="menuAudio" src="Audio/The distant waterfall.wav" autoplay loop></audio>
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+    <button id="proceedBtn">Proceed to Launcher</button>
+  </div>
+
+  <!-- Launcher -->
+  <div class="container" id="launcher">
+    <h1>I R O N W A K E</h1>
+    <h3>v0.7</h3>
+    <a href="../Scenes/PROLOGUE1.html"><button>START IRONWAKE</button></a><br><br>
+    <button id="chapterBtn">Chapter Select</button>
+    <div id="csShow">
+      Chapter Select is not recommended unless you want to play <br>
+      for fun and not for the story. <br>
+      Playing the game from the start is recommended to know about the main story <br>
+      and to avoid spoilers. <br><br>
+
+      The chapters are only divided by the full chapter and doesn't include the parts. <br>
+      If you would like to play a specific part, select it from this extended list: <a href="">test</a> <br><br>
+
+      <hr>
+
+      ACT 1 <br><br>
+      <a href="../../Scenes/PROLOGUE1.html"><button>PROLOGUE</button></a>
+      <a href="../../Scenes/C1S1.html"><button>CHAPTER 1</button></a>
+    </div><br>
+      <hr>
+    <h3>Update Notes</h3>
+    <h4>v0.8</h4>
+    <p>Revamped launcher and added preloader. <br>
+    Finished C1S3 and Battle Sequence. <br>
+    Currently working on C1S5.</p>
+  </div>
+
+  <script>
+    const chapterBtn = document.getElementById('chapterBtn');
+    const csShow = document.getElementById('csShow');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const proceedBtn = document.getElementById('proceedBtn');
+    const launcher = document.getElementById('launcher');
+
+    // Show proceed button after a short delay
+    setTimeout(() => {
+      document.getElementById('proceedBtn').style.opacity = 1;
+    }, 1200);
+
+    proceedBtn.addEventListener('click', () => {
+      loadingScreen.style.opacity = 0;
+      loadingScreen.style.visibility = 'hidden';
+      launcher.style.display = 'block';
+    });
+
+    chapterBtn.addEventListener('click', () => {
+      csShow.style.display = (csShow.style.display === 'none' || csShow.style.display === '') ? 'block' : 'none';
+    });
+
+    // Audio autoplay handling
+    document.addEventListener('DOMContentLoaded', () => {
+      const audio = document.getElementById('menuAudio');
+      audio.play().catch(() => {
+        document.addEventListener('click', () => {
+          audio.play();
+        }, { once: true });
+      });
+    });
+  </script>
+</body>
+</html>
