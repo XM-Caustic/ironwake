@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IRONWAKE CLIENT</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #222;
+      background-image: url('../../Backgrounds/hideout.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100%;
+      width: 100%;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    #fade-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    #textbox {
+      position: relative;
+      width: 95%;
+      max-width: 800px;
+      margin-bottom: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    #portrait {
+      width: 180px;
+      height: 180px;
+      background-color: #111;
+      margin-right: 15px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    /* Compact style if only name is shown */
+    #portrait.name-only {
+      width: auto;
+      height: auto;
+      background: none;
+      margin-right: 15px;
+    }
+
+    #char-name {
+      position: absolute;
+      top: -30px;
+      left: 0;
+      background: #000;
+      padding: 5px 10px;
+      font-weight: bold;
+    }
+
+    #portrait.name-only #char-name {
+      position: static;
+      border-radius: 8px;
+      top: auto;
+      left: auto;
+    }
+
+    #text-content {
+      flex: 1;
+      position: relative;
+    }
+
+    #click-hint {
+      font-size: 0.8em;
+      color: #aaa;
+      margin-top: 10px;
+      display: none;
+    }
+
+    #chapter-box {
+      position: absolute;
+      top: 20px;
+      left: -300px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      transition: left 0.5s ease-in-out;
+      z-index: 10;
+    }
+
+    #chapter-box.show {
+      left: 20px;
+    }
+
+    #title-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      z-index: 10;
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 600px) {
+      #textbox {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #portrait {
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+
+      #char-name {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="fade-overlay"></div>
+  <div id="title-box">Chapter 1 - 4<br>
+    The Merc Ghost<br>
+    August 30, 2012
+  </div>
+  <div id="game-container">
+    <div id="textbox">
+      <div id="portrait">
+        <div id="char-name"></div>
+      </div>
+      <div id="text-content">
+        <div id="dialogue-text"></div>
+        <div id="click-hint">(Click anywhere in this box to continue...)</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scenes = [
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `<i>Kurt unlocks the hideout, opening the lights. The hideout was well-lit, some equipment were scattered on the counters.</i> "This will have to do, for now." <i>Kurt said, letting the others in.</i>
+        Ava put some radars near the hideout, so if anyone is approaching here, we'll know."`
+      },
+      {
+        character: 'Ava',
+        portrait: 'ava.png',
+        text: `"The radars can detect up to 5 kilometers, just enough for us to spot oncoming people." Ava said, sitting down on the hideout's couch.`
+      },
+      {
+        text: `<i>Charlie hands the food from The Corner Plate to her crew members.</i>`
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `"So, what mission was our contractor gonna give us?" <i>Kaden asked, taking a bite from his burger.</i>`
+      },
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `"Our contractor said we're doing more missions with you on our side." <i>Kurt replied, checking his PDA for the Contractor's messages.</i>`
+      },
+      {
+        character: 'Sophia',
+        portrait: 'sophia.png',
+        text: `"Damn it, you guys got food and didn't wake me up?" <i>Sophia sighed, sitting next to Kaden.</i> "I'm still starving.."`,
+      },
+      {
+        character: 'Kaden',
+        portrait: 'kaden.png',
+        text: `<i>Kaden stared at Sophia, and gave her his burger.</i> "Fine, you can have mine."`
+      },
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `<i>Kurt got a notification from his PDA. They got a mission.</i> "The Contractor messaged, We have a mission tomorrow."`
+      },
+      {
+        text: `MSCTR: "This crew's current mission is to raid an organization's tower. Specifically Kairo Tower, A towering corporate monolith suspected of manufacturing black-market neuro-mods and distributing them through proxy companies. Several whistleblowers have mysteriously vanished after leaking internal documents."`
+      },
+      {
+        character: 'Kurt',
+        portrait: 'kurt.png',
+        text: `<i>Kurt reads the mission briefing with the crew.</i> "We have a big day tomorrow, we need to rest for the mission.`
+      }
+    ];
+
+    let index = 0;
+    const charName = document.getElementById('char-name');
+    const portrait = document.getElementById('portrait');
+    const dialogue = document.getElementById('dialogue-text');
+    const clickHint = document.getElementById('click-hint');
+    const fadeOverlay = document.getElementById('fade-overlay');
+
+    function showScene(i) {
+      const scene = scenes[i];
+      dialogue.innerHTML = scene.text;
+      clickHint.style.display = i === 0 ? 'block' : 'none';
+
+      // Hide portrait & name if both empty
+      if (!scene.character && !scene.portrait) {
+        portrait.style.display = 'none';
+        charName.textContent = '';
+      }
+      // Name but no portrait → compact name box
+      else if (scene.character && !scene.portrait) {
+        portrait.style.display = 'block';
+        portrait.classList.add('name-only');
+        charName.textContent = scene.character;
+        portrait.style.backgroundImage = 'none';
+      }
+      // Normal portrait + name
+      else {
+        portrait.style.display = 'block';
+        portrait.classList.remove('name-only');
+        charName.textContent = scene.character || '';
+        portrait.style.backgroundImage = scene.portrait
+          ? `url('../../Characters/${scene.portrait}')`
+          : 'none';
+      }
+    }
+
+    document.getElementById('textbox').addEventListener('click', () => {
+      index++;
+      if (index < scenes.length) {
+        showScene(index);
+      } else {
+        fadeOverlay.style.opacity = 1;
+        setTimeout(() => {
+          window.location.href = '../ironwake/launcher.html';
+        }, 800);
+      }
+    });
+
+    window.addEventListener('load', () => {
+      fadeOverlay.style.opacity = 0;
+    });
+
+    showScene(index);
+  </script>
+</body>
+</html>

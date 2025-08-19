@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IRONWAKE — Battle</title>
+  <title>IRONWAKE CLIENT</title>
   <style>
     :root {
       --bg: #000000;
@@ -16,7 +16,8 @@
       height: 100%;
       margin: 0;
       background: var(--bg);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+      font-family: monospace;
+      color: white;
     }
     .wrap {
       display: flex;
@@ -27,17 +28,17 @@
       padding: 18px;
       box-sizing: border-box;
     }
-    .start {
+    .start, .tutorial {
       display: flex;
       flex-direction: column;
       gap: 18px;
       align-items: center;
       justify-content: center;
+      text-align: center;
+      color: var(--text);
     }
     .msg {
-      color: var(--text);
       font-size: 18px;
-      text-align: center;
       line-height: 1.2;
     }
     button {
@@ -48,6 +49,7 @@
       font-size: 16px;
       cursor: pointer;
       appearance: none;
+      font-family: monospace;
     }
     .battle {
       display: none;
@@ -69,7 +71,6 @@
       background: var(--panel);
     }
     .unit .name {
-      color: var(--text);
       font-size: 14px;
     }
     .hp-row {
@@ -85,14 +86,11 @@
     }
     .hpfill {
       position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
+      left: 0; top: 0; bottom: 0;
       width: 100%;
       background: var(--accent);
     }
     .hptext {
-      color: var(--text);
       font-size: 12px;
       min-width: 64px;
       text-align: right;
@@ -104,11 +102,7 @@
       display: flex;
       align-items: flex-end;
     }
-    .log p {
-      color: var(--text);
-      margin: 0;
-      font-size: 14px;
-    }
+    .log p { margin: 0; font-size: 14px; }
     .actions {
       display: flex;
       gap: 8px;
@@ -118,7 +112,6 @@
       flex: 1;
       padding: 12px 10px;
       background: var(--muted);
-      color: var(--text);
       border: none;
       font-size: 14px;
       cursor: pointer;
@@ -127,49 +120,81 @@
       display: none;
       padding: 14px;
       background: var(--panel);
-      color: var(--text);
       text-align: center;
     }
-    * {
-      user-select: none;
-    }
+    * { user-select: none; }
     @media(min-width:700px) {
       .wrap { max-width: 720px; margin: 0 auto; }
     }
 
-    /* Transition animations */
-    .fade-out {
-      animation: fadeOut 0.8s forwards;
+    /* Animations */
+    .fade-out { animation: fadeOut 0.8s forwards; }
+    .fade-in { animation: fadeIn 0.8s forwards; }
+    @keyframes fadeOut { from{opacity:1;} to{opacity:0;} }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+    /* Loss overlay */
+    .loss-overlay {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(255,0,0,0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      opacity: 0;
+      pointer-events: none;
+      flex-direction: column;
+      z-index: 999;
     }
-    .fade-in {
-      animation: fadeIn 0.8s forwards;
+    .loss-overlay.show {
+      animation: fadeRed 2s forwards;
+      pointer-events: auto;
     }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
+    @keyframes fadeRed {
+      from { background: rgba(255,0,0,0); opacity: 0; }
+      to { background: rgba(109,0,0,0.85); opacity: 1; }
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .retry-btn {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background-color: black;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
+    <!-- Start Screen -->
     <div class="start" id="startScreen">
-      <div class="msg">Press READY to start the battle.</div>
+      <div class="msg"><h3>TACTICAL ENCOUNTER IN PROGRESS</h3><p>[Click READY to begin.]</p></div>
       <button id="ready">Ready</button>
     </div>
+
+    <!-- Tutorial Screen -->
+    <div class="tutorial" id="tutorialScreen" style="display:none;">
+      <h3>Battle Tutorial</h3>
+      <p><b>Shoot</b> – Reliable ranged attack (200–300 dmg).</p>
+      <p><b>DuoShot</b> – Two weaker shots (150–250 each).</p>
+      <p><b>Knife</b> – Risky melee strike (300–400 dmg, 50% hit chance).</p>
+      <p><b>Defend</b> – Brace and reduce next damage by 35%.</p>
+      <button id="tutorialOk">Understood</button>
+    </div>
+
+    <!-- Battle UI -->
     <div class="battle" id="battleUI" aria-hidden="true">
       <div class="hud">
-        <div class="unit" id="playerUnit">
+        <div class="unit">
           <div class="name">Kaden</div>
           <div class="hp-row">
             <div class="hpbar"><div class="hpfill" id="playerHPfill"></div></div>
             <div class="hptext" id="playerHPtext">HP</div>
           </div>
         </div>
-        <div class="unit" id="enemyUnit">
+        <div class="unit">
           <div class="name">Merc Ghost</div>
           <div class="hp-row">
             <div class="hpbar"><div class="hpfill" id="enemyHPfill"></div></div>
@@ -187,132 +212,89 @@
       <div class="end" id="endMsg"></div>
     </div>
   </div>
-  <audio id="battleAudio" src="../Audio/placeholderbattle.mp3" preload="auto"></audio>
+
+  <!-- Loss overlay -->
+  <div class="loss-overlay" id="lossOverlay">
+    <div id="lossText"></div>
+    <button class="retry-btn" id="retryBtn" style="display:none;">Retry</button>
+  </div>
+
+  <!-- Audio -->
+  <audio id="battleAudio" src="../Audio/UNKNOWN FATE.mp3" preload="auto" loop></audio>
+  <audio id="enemyDeathAudio" src="../Audio/enemyDeath.mp3" preload="auto"></audio>
+
   <script>
-    const PLAYER_MAX = 100;
-    const ENEMY_MAX = 80;
+    const PLAYER_MAX = 5000, ENEMY_MAX = 4000;
     let player = {hp:PLAYER_MAX,defending:false};
     let enemy = {hp:ENEMY_MAX};
 
     const startScreen=document.getElementById('startScreen');
+    const tutorialScreen=document.getElementById('tutorialScreen');
     const battleUI=document.getElementById('battleUI');
     const readyBtn=document.getElementById('ready');
+    const tutorialOk=document.getElementById('tutorialOk');
     const logEl=document.getElementById('log');
     const actions=document.getElementById('actions');
     const endMsg=document.getElementById('endMsg');
     const audio=document.getElementById('battleAudio');
+    const enemyDeathAudio=document.getElementById('enemyDeathAudio');
     const playerHPfill=document.getElementById('playerHPfill');
     const enemyHPfill=document.getElementById('enemyHPfill');
     const playerHPtext=document.getElementById('playerHPtext');
     const enemyHPtext=document.getElementById('enemyHPtext');
+    const lossOverlay=document.getElementById('lossOverlay');
+    const lossText=document.getElementById('lossText');
+    const retryBtn=document.getElementById('retryBtn');
 
     function updateUI(){
-      playerHPfill.style.width=Math.max(0,(player.hp/PLAYER_MAX)*100)+'%';
-      enemyHPfill.style.width=Math.max(0,(enemy.hp/ENEMY_MAX)*100)+'%';
-      playerHPtext.textContent=Math.max(0,Math.round(player.hp))+' / '+PLAYER_MAX;
-      enemyHPtext.textContent=Math.max(0,Math.round(enemy.hp))+' / '+ENEMY_MAX;
+      playerHPfill.style.width=(player.hp/PLAYER_MAX*100)+"%";
+      enemyHPfill.style.width=(enemy.hp/ENEMY_MAX*100)+"%";
+      playerHPtext.textContent=player.hp+" / "+PLAYER_MAX;
+      enemyHPtext.textContent=enemy.hp+" / "+ENEMY_MAX;
     }
-    function pushLog(t){logEl.innerHTML='<p>'+t+'</p>';}
+    function pushLog(t){logEl.innerHTML='<p>'+t+'</p>'}
     function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
 
-    function playerShoot(){
-      const dmg=randInt(12,18);
-      enemy.hp=Math.max(0,enemy.hp-dmg);
-      pushLog('Kaden uses Shoot and deals '+dmg+' damage.');
-      endOfTurn();
-    }
-    function playerDuoShot(){
-      const dmg1=randInt(10,15);
-      const dmg2=randInt(10,15);
-      const total=dmg1+dmg2;
-      enemy.hp=Math.max(0,enemy.hp-total);
-      pushLog('Kaden uses DuoShot and deals '+total+' total damage (two hits).');
-      endOfTurn();
-    }
-    function playerKnife(){
-      const hit=Math.random()<0.5;
-      if(hit){
-        const dmg=randInt(28,38);
-        enemy.hp=Math.max(0,enemy.hp-dmg);
-        pushLog('Kaden uses Knife and hits for '+dmg+' damage.');
-      } else {
-        pushLog('Kaden attempts Knife attack but misses.');
+    function playerShoot(){const d=randInt(200,300);enemy.hp-=d;pushLog("Kaden uses Shoot ("+d+")");endOfTurn();}
+    function playerDuoShot(){const d1=randInt(150,250),d2=randInt(150,250);enemy.hp-=d1+d2;pushLog("Kaden uses DuoShot ("+(d1+d2)+")");endOfTurn();}
+    function playerKnife(){if(Math.random()<0.5){const d=randInt(300,400);enemy.hp-=d;pushLog("Kaden stabs ("+d+")");}else pushLog("Knife missed.");endOfTurn();}
+    function playerDefend(){player.defending=true;pushLog("Kaden defends.");endOfTurn();}
+    function enemyAttack(){if(enemy.hp<=0)return;let d=randInt(300,350);if(player.defending)d=Math.ceil(d*0.65);player.hp-=d;player.defending=false;pushLog("Merc Ghost hits ("+d+")");}
+
+    function scrambleText(txt,el,cb){const chars="!@#$%^&*()_+=-<>?/{}[]";let out=Array(txt.length).fill(""),i=0;const iv=setInterval(()=>{for(let j=0;j<txt.length;j++){out[j]=j<i?txt[j]:chars[Math.floor(Math.random()*chars.length)];}el.textContent=out.join("");if(i++>=txt.length){clearInterval(iv);if(cb)cb();}},80);}
+    function fadeOutAudio(a){let f=setInterval(()=>{if(a.volume>0.05){a.volume-=0.05;}else{a.pause();a.volume=1;clearInterval(f);}},200);}
+    function checkEnd(){
+      if(enemy.hp<=0){
+        actions.style.display="none";
+        endMsg.style.display="block";
+        endMsg.innerHTML="Victory!<br><button onclick=\"location.href='../Scenes/C1S4.html'\">Continue</button>";
+        pushLog("Merc Ghost defeated.");
+
+        // Fade out the battle music
+        fadeOutAudio(audio);
+
+        // Play enemy death instantly at full volume
+        enemyDeathAudio.volume = 1;
+        enemyDeathAudio.play().catch(()=>{});
+
+        return true;
       }
-      endOfTurn();
+      if(player.hp<=0){
+        actions.style.display="none";
+        lossOverlay.classList.add("show");
+        fadeOutAudio(audio);
+        scrambleText("TACTICAL MISCALCULATION, RETRY?",lossText,()=>{retryBtn.style.display="block";});
+        retryBtn.onclick=()=>location.reload();
+        return true;
+      }
+      return false;
     }
-    function playerDefend(){
-      player.defending=true;
-      pushLog('Kaden braces for impact (defend).');
-      endOfTurn();
-    }
-    function enemyAttack(){
-      if(enemy.hp<=0)return;
-      let dmg=randInt(10,22);
-      if(player.defending){dmg=Math.ceil(dmg*(1-0.35));}
-      player.hp=Math.max(0,player.hp-dmg);
-      player.defending=false;
-      pushLog('Merc Ghost attacks and deals '+dmg+' damage.');
-    }
-function checkEnd(){
-  if(enemy.hp<=0){
-    actions.style.display='none';
-    endMsg.style.display='block';
-    endMsg.innerHTML = `
-      The Merc Ghost disappears as Kaden blinked.<br><br>
-      <button id="continueBtn">Continue</button>
-    `;
-    pushLog('Victory — Merc Ghost defeated.');
+    function endOfTurn(){updateUI();setTimeout(()=>{if(checkEnd())return;enemyAttack();updateUI();checkEnd();},400);}
 
-    // Add redirect behavior
-    document.getElementById('continueBtn').addEventListener('click', () => {
-      window.location.href = '../Scenes/C1S4.html';
-    });
-    return true;
-  }
-  if(player.hp<=0){
-    actions.style.display='none';
-    endMsg.style.display='block';
-    endMsg.textContent='Kaden has fallen.';
-    pushLog('Kaden has been defeated...');
-    return true;
-  }
-  return false;
-}
+    actions.addEventListener("click",e=>{if(!e.target.dataset.action)return;({shoot:playerShoot,duoshot:playerDuoShot,knife:playerKnife,defend:playerDefend}[e.target.dataset.action])();});
 
-    function endOfTurn(){
-      updateUI();
-      setTimeout(()=>{
-        if(checkEnd())return;
-        enemyAttack();
-        updateUI();
-        if(checkEnd())return;
-      },400);
-    }
-
-    actions.addEventListener('click',e=>{
-      const act=e.target.getAttribute('data-action');
-      if(act==='shoot')playerShoot();
-      else if(act==='duoshot')playerDuoShot();
-      else if(act==='knife')playerKnife();
-      else if(act==='defend')playerDefend();
-    });
-
-    readyBtn.addEventListener('click',()=>{
-      // fade out start screen
-      startScreen.classList.add('fade-out');
-
-      setTimeout(() => {
-        startScreen.style.display='none';
-        battleUI.style.display='flex';
-        battleUI.classList.add('fade-in');
-
-        player.hp=PLAYER_MAX;player.defending=false;enemy.hp=ENEMY_MAX;
-        updateUI();
-        pushLog('Kaden is ready.');
-        audio.currentTime=0;
-        audio.play().catch(()=>{});
-      }, 800); // matches fadeOut duration
-    });
+    readyBtn.onclick=()=>{startScreen.style.display="none";tutorialScreen.style.display="flex";};
+    tutorialOk.onclick=()=>{tutorialScreen.style.display="none";battleUI.style.display="flex";player.hp=PLAYER_MAX;enemy.hp=ENEMY_MAX;updateUI();pushLog("Kaden is ready.");audio.play().catch(()=>{});};
 
     updateUI();
   </script>

@@ -133,7 +133,7 @@
 <body>
   <div id="fade-overlay"></div>
   <div id="chapter-box" style="display: none;"></div>
-  <div id="title-box">CHAPTER S7VN-10<br>
+  <div id="title-box">CHAPTER Z3TA-10<br>
   Entering Neo-Essurarlands<br>
   August 29, 2012
   </div>
@@ -246,18 +246,28 @@
 
     function showScene(i) {
       const scene = scenes[i];
-
       dialogue.innerHTML = scene.text;
       clickHint.style.display = i === 0 ? 'block' : 'none';
 
-      // Hide portrait & name if both are empty
+      // Hide portrait & name if both empty
       if (!scene.character && !scene.portrait) {
         portrait.style.display = 'none';
-      } else {
+        charName.textContent = '';
+      }
+      // Name but no portrait → compact name box
+      else if (scene.character && !scene.portrait) {
         portrait.style.display = 'block';
+        portrait.classList.add('name-only');
         charName.textContent = scene.character;
+        portrait.style.backgroundImage = 'none';
+      }
+      // Normal portrait + name
+      else {
+        portrait.style.display = 'block';
+        portrait.classList.remove('name-only');
+        charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('../Characters/${scene.portrait}')`
+          ? `url('../../Characters/${scene.portrait}')`
           : 'none';
       }
     }
@@ -269,7 +279,7 @@
       } else {
         fadeOverlay.style.opacity = 1;
         setTimeout(() => {
-          window.location.href = '../../Scenes/C1S1.html';
+          window.location.href = '../Scenes/C1S2.html';
         }, 800);
       }
     });
@@ -277,12 +287,6 @@
     window.addEventListener('load', () => {
       fadeOverlay.style.opacity = 0;
     });
-
-    const chapterBox = document.getElementById('chapter-box');
-    chapterBox.classList.add('show');
-    setTimeout(() => {
-      chapterBox.classList.remove('show');
-    }, 3000);
 
     showScene(index);
   </script>
