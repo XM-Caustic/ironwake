@@ -8,7 +8,7 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('../../Backgrounds/carnight.jpg');
+      background-image: url('/Assets/bg_carnight.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -176,27 +176,27 @@
       },
       {
         character: 'Kurt',
-        portrait: 'kurt.png',
+        portrait: 'ch_kurt.png',
         text: `"So, Kaden." Kurt spoke up, rubbing his eyes. "Where are you from? Mind sharing some background?"`
       },
       {
         character: 'Kaden',
-        portrait: 'kaden.png',
+        portrait: 'ch_kaden.png',
         text: `"I'm from Kyoshin, 20 years old. Full name is Kaden Harlow." Kaden said, still looking out the car's window.`,
       },
       {
         character: 'Kaden',
-        portrait: 'kaden.png',
+        portrait: 'ch_kaden.png',
         text: `"...Sorry, did you want a full biography?" Kaden added, both hungry and sleepy.`,
       },
       {
         character: 'Noah',
-        portrait: 'noah.png',
+        portrait: 'ch_noah.png',
         text: `Noah looked at Kaden, studying him. "The kid is hungry, let's get food." He said calmly. "Also, let us hear your full background."`
       },
       {
         character: 'Kaden',
-        portrait: 'kaden.png',
+        portrait: 'ch_kaden.png',
         text: `"Alright then." Kaden replied, waking up a little from the mention of food.`,
       },
       {
@@ -236,7 +236,7 @@
         portrait.classList.remove('name-only');
         charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('../../Characters/${scene.portrait}')`
+          ? `url('/Assets/${scene.portrait}')`
           : 'none';
       }
     }
@@ -248,7 +248,7 @@
       } else {
         fadeOverlay.style.opacity = 1;
         setTimeout(() => {
-          window.location.href = '../Scenes/C1S3.html';
+          window.location.href = 'C1S3.html';
         }, 800);
       }
     });

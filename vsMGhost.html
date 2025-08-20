@@ -220,8 +220,8 @@
   </div>
 
   <!-- Audio -->
-  <audio id="battleAudio" src="../Audio/UNKNOWN FATE.mp3" preload="auto" loop></audio>
-  <audio id="enemyDeathAudio" src="../Audio/enemyDeath.mp3" preload="auto"></audio>
+  <audio id="battleAudio" src="/Assets/UNKNOWN FATE.mp3" preload="auto" loop></audio>
+  <audio id="enemyDeathAudio" src="/Assets/enemyDeath.mp3" preload="auto"></audio>
 
   <script>
     const PLAYER_MAX = 5000, ENEMY_MAX = 4000;
@@ -267,7 +267,7 @@
       if(enemy.hp<=0){
         actions.style.display="none";
         endMsg.style.display="block";
-        endMsg.innerHTML="Victory!<br><button onclick=\"location.href='../Scenes/C1S4.html'\">Continue</button>";
+        endMsg.innerHTML="Victory!<br><button onclick=\"location.href='C1S4.html'\">Continue</button>";
         pushLog("Merc Ghost defeated.");
 
         // Fade out the battle music

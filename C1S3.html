@@ -8,7 +8,7 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('../../Backgrounds/carnight.jpg');
+      background-image: url('/Assets/bg_carnight.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -176,22 +176,22 @@
       },   
       {
         character: 'Charlie',
-        portrait: 'charlie.png',
+        portrait: 'ch_charlie.png',
         text: `"Alright, what do you guys want?" Charlie asked, waiting in line at the drive through.`,
       },         
       {
         character: 'Kurt',
-        portrait: 'kurt.png',
+        portrait: 'ch_kurt.png',
         text: `"I'll just get a Corner Club." Kurt said, looking at the cars in front of them.`,
       },         
       {
         character: 'Noah',
-        portrait: 'noah.png',
+        portrait: 'ch_noah.png',
         text: `"I'd like a Diner Chilli Bowl with Ginger Ale." Noah replied, rubbing his eyes.`,
       },         
       {
         character: 'Kaden',
-        portrait: 'kaden.png',
+        portrait: 'ch_kaden.png',
         text: `"You can get me anything, I'm not choosy." Kaden responded, leaning on the car's seat.`,
       },         
       {
@@ -201,12 +201,12 @@
       },         
       {
         character: 'Charlie',
-        portrait: 'charlie.png',
+        portrait: 'ch_charlie.png',
         text: `"H-Hey, where is he going?!" Charlie exclaimed, turning around on her seat.`,
       },         
       {
         character: 'Kaden',
-        portrait: 'kaden.png',
+        portrait: 'ch_kaden.png',
         text: `"I'm showing this crew a demonstration." Kaden said, running towards the man in the guille suit.`,
       },         
     ];
@@ -241,7 +241,7 @@
         portrait.classList.remove('name-only');
         charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('../../Characters/${scene.portrait}')`
+          ? `url('/Assets/${scene.portrait}')`
           : 'none';
       }
     }
@@ -253,7 +253,7 @@
       } else {
         fadeOverlay.style.opacity = 1;
         setTimeout(() => {
-          window.location.href = '../Battles/vsMGhost.html';
+          window.location.href = 'vsMGhost.html';
         }, 800);
       }
     });

@@ -8,7 +8,7 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('../../Backgrounds/carnight.jpg');
+      background-image: url('/Assets/bg_carnight.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -176,22 +176,22 @@
       },     
       {
         character: 'Kaden',
-        portrait: 'kaden.png',
+        portrait: 'ch_kaden.png',
         text: `Kaden huffed, walking back to the car. "Knew it, We're not safe here either."`
       },
       {
         character: 'Sophia',
-        portrait: 'sophia.png',
+        portrait: 'ch_sophia.png',
         text: `Sophia tilted her head upon hearing Kaden's words. "That can't be. We've already moved places."`
       },
       {
         character: 'Kurt',
-        portrait: 'kurt.png',
+        portrait: 'ch_kurt.png',
         text: `"If that's true, then we need to hurry to the hideout." Kurt said. "Charlie, head straight to the hideout."`,
       },
       {
         character: 'Charlie',
-        portrait: 'charlie.png',
+        portrait: 'ch_charlie.png',
         text: `"Alright then, we'll just eat at the hideout!" Charlie said, turning the car and driving to their hideout.`,
       },
     ];
@@ -226,7 +226,7 @@
         portrait.classList.remove('name-only');
         charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('../../Characters/${scene.portrait}')`
+          ? `url('/Assets/${scene.portrait}')`
           : 'none';
       }
     }
@@ -238,7 +238,7 @@
       } else {
         fadeOverlay.style.opacity = 1;
         setTimeout(() => {
-          window.location.href = '../Scenes/C1S5.html';
+          window.location.href = '/C1S5.html';
         }, 800);
       }
     });
