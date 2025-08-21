@@ -8,7 +8,7 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('/Assets/bg_hideout.jpg');
+      background-image: url('bg_hideout.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -243,7 +243,7 @@
         portrait.classList.remove('name-only');
         charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('/Assets/${scene.portrait}')`
+          ? `url('${scene.portrait}')`
           : 'none';
       }
     }

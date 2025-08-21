@@ -8,7 +8,7 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('/Assets/bg_dockside.jpg');
+      background-image: url('bg_dockside.jpg');
       height: 25%;
       width: 25%;
       color: #fff;
@@ -267,7 +267,7 @@
         portrait.classList.remove('name-only');
         charName.textContent = scene.character || '';
         portrait.style.backgroundImage = scene.portrait
-          ? `url('/Assets/${scene.portrait}')`
+          ? `url('${scene.portrait}')`
           : 'none';
       }
     }
