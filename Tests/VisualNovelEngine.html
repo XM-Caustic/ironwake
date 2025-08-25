@@ -3,11 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Visual Novel Engine</title>
+  <title>IRONWAKE CLIENT</title>
   <style>
     body {
       margin: 0;
       background-color: #222;
+      background-image: url('') /*Put your background files here*/;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100%;
+      width: 100%;
       color: #fff;
       font-family: Arial, sans-serif;
       overflow: hidden;
@@ -41,7 +47,6 @@
       max-width: 800px;
       margin-bottom: 30px;
       background: rgba(0, 0, 0, 0.8);
-      border-radius: 10px;
       padding: 20px;
       display: flex;
       align-items: flex-start;
@@ -54,10 +59,18 @@
       height: 180px;
       background-color: #111;
       margin-right: 15px;
-      border-radius: 10px;
       background-size: cover;
       background-position: center;
+      background-repeat: no-repeat;
       position: relative;
+    }
+
+    /* Compact style if only name is shown */
+    #portrait.name-only {
+      width: auto;
+      height: auto;
+      background: none;
+      margin-right: 15px;
     }
 
     #char-name {
@@ -66,8 +79,14 @@
       left: 0;
       background: #000;
       padding: 5px 10px;
-      border-radius: 8px 8px 0 0;
       font-weight: bold;
+    }
+
+    #portrait.name-only #char-name {
+      position: static;
+      border-radius: 8px;
+      top: auto;
+      left: auto;
     }
 
     #text-content {
@@ -88,7 +107,6 @@
       left: -300px;
       background: rgba(0, 0, 0, 0.9);
       padding: 15px 20px;
-      border-radius: 0 10px 10px 0;
       transition: left 0.5s ease-in-out;
       z-index: 10;
     }
@@ -103,7 +121,6 @@
       right: 20px;
       background: rgba(0, 0, 0, 0.9);
       padding: 15px 20px;
-      border-radius: 10px;
       z-index: 10;
       font-weight: bold;
     }
@@ -129,9 +146,9 @@
 </head>
 <body>
   <div id="fade-overlay"></div>
-  <div id="chapter-box" style="display: none;"></div>
-  <div id="title-box">IRONWAKE DEMO <br>
-  Revision 3
+  <div id="title-box">Chapter X-X<br> <!--Chapter number and part-->
+    The Merc Ghost<br> <!--Title-->
+    August 30, 2012 <!--Date (or anything else if you want)-->
   </div>
   <div id="game-container">
     <div id="textbox">
@@ -140,22 +157,23 @@
       </div>
       <div id="text-content">
         <div id="dialogue-text"></div>
-        <div id="click-hint">(Click anywhere in this box to continue...)</div>
+        <div id="click-hint">(Click anywhere in this box to continue...)</div> <!--Clicking continues dialogue-->
       </div>
     </div>
   </div>
 
+  <!-- Background Music -->
+  <audio id="bg-music" loop>
+    <source src="Audio/background.mp3" type="audio/mpeg"> <!--Change this path to your BGM-->
+    Your browser does not support the audio element.
+  </audio>
+
   <script>
-    const scenes = [
+  const scenes = [
       {
-        character: 'Test',
-        portrait: '.png',
-        text: `"Put your dialogue like this." Put your text here. <i>Put your actions like this.</i>`,
-      },
-      {
-        character: 'Karmin',
-        portrait: '.png',
-        text: '"Hello, I am XMCaustic, I made all of this!" I am a web developer and a music producer, <i>And my skills are all put in this project.</i>'
+        character: 'Your Character Name', //Character name here
+        portrait: 'ch_character_image.png', //Character portrait file here
+        text: `<i>Character action</i> "character text"` //Character dialogue here
       },
     ];
 
@@ -165,42 +183,57 @@
     const dialogue = document.getElementById('dialogue-text');
     const clickHint = document.getElementById('click-hint');
     const fadeOverlay = document.getElementById('fade-overlay');
+    const bgMusic = document.getElementById('bg-music');
 
     function showScene(i) {
       const scene = scenes[i];
-      charName.textContent = scene.character;
-      portrait.style.backgroundImage = `url('${scene.portrait}')`;
       dialogue.innerHTML = scene.text;
       clickHint.style.display = i === 0 ? 'block' : 'none';
+
+      // Hide portrait & name if both empty
+      if (!scene.character && !scene.portrait) {
+        portrait.style.display = 'none';
+        charName.textContent = '';
+      }
+      // Name but no portrait → compact name box
+      else if (scene.character && !scene.portrait) {
+        portrait.style.display = 'block';
+        portrait.classList.add('name-only');
+        charName.textContent = scene.character;
+        portrait.style.backgroundImage = 'none';
+      }
+      // Normal portrait + name
+      else {
+        portrait.style.display = 'block';
+        portrait.classList.remove('name-only');
+        charName.textContent = scene.character || '';
+        portrait.style.backgroundImage = scene.portrait
+          ? `url('${scene.portrait}')`
+          : 'none';
+      }
     }
 
     document.getElementById('textbox').addEventListener('click', () => {
+      // Start music on first click (autoplay restriction bypass)
+      if (bgMusic.paused) {
+        bgMusic.play().catch(err => console.log("Autoplay blocked:", err));
+      }
+
       index++;
       if (index < scenes.length) {
         showScene(index);
       } else {
-        // Fade out and redirect
-        fadeOverlay.style.opacity = 1;
+        fadeOverlay.style.opacity = 1; //Fade to black
         setTimeout(() => {
-          window.location.href = 'nextpage.html'; // Replace with your actual next page
+          window.location.href = 'yourdestination.html'; //Next scene/page
         }, 800);
       }
     });
 
-    // Fade-in on load
     window.addEventListener('load', () => {
-      fadeOverlay.style.opacity = 0;
+      fadeOverlay.style.opacity = 0; //Fade in from black
+      showScene(index); //Start first scene
     });
-
-    // Chapter box animation
-    const chapterBox = document.getElementById('chapter-box');
-    chapterBox.classList.add('show');
-    setTimeout(() => {
-      chapterBox.classList.remove('show');
-    }, 3000);
-
-    // Start first scene
-    showScene(index);
   </script>
 </body>
 </html>

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZETA Raid Battle</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --panel: #0b0b0b;
+      --muted: #1a1a1a;
+      --accent: #2b2b2b;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100%; margin: 0;
+      background: var(--bg);
+      font-family: monospace;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 20px;
+      background: var(--bg);
+      width: 95%;
+      max-width: 1500px; /* wider battlefield */
+      box-sizing: border-box;
+    }
+    /* Player row */
+    .players {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+    }
+    .unit {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      background: var(--panel);
+      min-width: 180px;
+      max-width: 250px;
+      position: relative;
+      border-bottom: 3px solid transparent;
+    }
+    .unit.active {
+      border-bottom: 3px solid white;
+    }
+    .hpbar {
+      height: 14px;
+      background: var(--muted);
+      flex: 1;
+      position: relative;
+      border: 1px solid #333;
+      overflow: hidden;
+    }
+    .hpfill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 100%; background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    /* Enemy full width */
+    .enemy {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      background: var(--panel);
+      border-bottom: 3px solid transparent;
+    }
+    .enemy.active {
+      border-bottom: 3px solid white;
+    }
+    /* Controls + Log */
+    .controls { display: flex; gap: 10px; justify-content: center; }
+    .controls button {
+      background: var(--muted);
+      border: 1px solid #333;
+      padding: 6px 12px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .log {
+      background: var(--panel);
+      padding: 10px;
+      min-height: 80px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Player row -->
+    <div class="players">
+      <div class="unit active" data-hp="100" data-max="100">
+        <div>Kaden</div>
+        <div class="hpbar"><div class="hpfill"></div></div>
+      </div>
+      <div class="unit" data-hp="100" data-max="100">
+        <div>Kurt</div>
+        <div class="hpbar"><div class="hpfill"></div></div>
+      </div>
+      <div class="unit" data-hp="100" data-max="100">
+        <div>Sophia</div>
+        <div class="hpbar"><div class="hpfill"></div></div>
+      </div>
+    </div>
+
+    <!-- Enemy full width -->
+    <div class="enemy" data-hp="300" data-max="300">
+      <div>Enemy — Wave 1</div>
+      <div class="hpbar"><div class="hpfill"></div></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button onclick="attack()">Attack</button>
+      <button onclick="defend()">Defend</button>
+      <button onclick="skip()">Skip</button>
+    </div>
+
+    <!-- Log -->
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    const players = document.querySelectorAll('.unit');
+    const enemy = document.querySelector('.enemy');
+    const log = document.getElementById('log');
+    let turn = 0;
+    let wave = 1;
+    const maxWaves = 5;
+
+    function updateHP(unit) {
+      let hp = +unit.dataset.hp;
+      let max = +unit.dataset.max;
+      if (hp < 0) hp = 0;
+      const fill = unit.querySelector('.hpfill');
+      fill.style.width = (hp / max * 100) + '%';
+    }
+
+    function logMsg(msg) {
+      log.innerHTML += msg + '<br>';
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function nextTurn() {
+      players.forEach(p => p.classList.remove('active'));
+      enemy.classList.remove('active');
+
+      if (turn < players.length) {
+        players[turn].classList.add('active');
+      } else {
+        enemy.classList.add('active');
+        setTimeout(enemyAttack, 800);
+      }
+    }
+
+    function attack() {
+      if (turn >= players.length) return;
+      const dmg = Math.floor(Math.random() * 25) + 10;
+      enemy.dataset.hp -= dmg;
+      updateHP(enemy);
+      logMsg(players[turn].children[0].textContent + ' attacks for ' + dmg + ' damage!');
+      checkEnemy();
+      turn++;
+      nextTurn();
+    }
+
+    function defend() {
+      if (turn >= players.length) return;
+      logMsg(players[turn].children[0].textContent + ' defends (reduced damage next hit).');
+      players[turn].dataset.defend = 1;
+      turn++;
+      nextTurn();
+    }
+
+    function skip() {
+      if (turn >= players.length) return;
+      logMsg(players[turn].children[0].textContent + ' skips.');
+      turn++;
+      nextTurn();
+    }
+
+    function enemyAttack() {
+      const alivePlayers = Array.from(players).filter(p => p.dataset.hp > 0);
+      if (!alivePlayers.length) {
+        logMsg("ZETA has been defeated...");
+        return;
+      }
+      const target = alivePlayers[Math.floor(Math.random() * alivePlayers.length)];
+      let dmg = Math.floor(Math.random() * 20) + 5;
+      if (target.dataset.defend) {
+        dmg = Math.floor(dmg / 2);
+        target.dataset.defend = 0;
+      }
+      target.dataset.hp -= dmg;
+      updateHP(target);
+      logMsg("Enemy attacks " + target.children[0].textContent + " for " + dmg + "!");
+      if (target.dataset.hp <= 0) {
+        logMsg(target.children[0].textContent + " has fallen!");
+      }
+      turn = 0;
+      nextTurn();
+    }
+
+    function checkEnemy() {
+      if (enemy.dataset.hp <= 0) {
+        logMsg("Enemy defeated!");
+        wave++;
+        if (wave > maxWaves) {
+          logMsg("All waves cleared! Victory!");
+          return;
+        }
+        // new wave
+        enemy.dataset.hp = 200 + wave * 100;
+        enemy.dataset.max = enemy.dataset.hp;
+        enemy.querySelector('div').textContent = "Enemy — Wave " + wave;
+        updateHP(enemy);
+        logMsg("Wave " + wave + " approaches!");
+      }
+    }
+
+    // init HP bars
+    players.forEach(updateHP);
+    updateHP(enemy);
+    nextTurn();
+  </script>
+</body>
+</html>

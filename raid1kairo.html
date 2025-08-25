@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kairo Tower</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .game-container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    #wave {
+      text-align: center;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .team-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .team {
+      flex: 1;
+      background-color: #111;
+      padding: 10px;
+    }
+
+    .team h3 {
+      margin-top: 0;
+      text-align: center;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #222;
+    }
+
+    .char {
+      padding: 6px 0;
+      border-bottom: 1px solid #222;
+    }
+
+    .char:last-child {
+      border-bottom: none;
+    }
+
+    #actions {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .action-btn {
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      margin: 0 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .action-btn:hover {
+      background: #555;
+    }
+
+    #battle-log {
+      background-color: #111;
+      color: #ddd;
+      padding: 10px;
+      height: 150px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Kairo Tower</h1>
+    <div id="wave">Wave: 1/5</div>
+
+    <div class="team-section">
+      <div class="team" id="se7en-team">
+        <h3>SE7EN</h3>
+      </div>
+      <div class="team" id="enemy-team">
+        <h3>Guards</h3>
+      </div>
+    </div>
+
+    <div id="actions"></div>
+    <div id="battle-log"></div>
+  </div>
+
+  <script>
+  const maxWaves = 5;
+  let wave = 1;
+  let currentPlayerIndex = 0;
+  let allDefending = false;
+  let guards = [];
+  let brainhackTurnsLeft = 0;
+
+  const SE7EN = [
+    { name: "Kaden", maxHp: 100, hp: 100, atk: 20, cooldown: 0, defending: false },
+    { name: "Kurt", maxHp: 100, hp: 100, atk: 15, cooldown: 0, defending: false },
+    { name: "Noah", maxHp: 100, hp: 100, atk: 18, cooldown: 0, defending: false },
+    { name: "Charlie", maxHp: 100, hp: 100, atk: 22, cooldown: 0, defending: false },
+    { name: "Sophia", maxHp: 100, hp: 100, atk: 16, cooldown: 0, defending: false },
+    { name: "Ava", maxHp: 100, hp: 100, atk: 17, cooldown: 0, defending: false }
+  ];
+
+  function spawnGuards() {
+    guards = [];
+    for (let i = 0; i < 3 + wave; i++) {
+      guards.push({ name: `Guard ${i + 1}`, hp: 50 + wave * 10, atk: 10 + wave * 2, stunned: false });
+    }
+  }
+
+  function healSE7EN() {
+    SE7EN.forEach(member => {
+      member.hp = member.maxHp;
+      member.defending = false;
+    });
+  }
+
+  function renderTeams() {
+    const se7enDiv = document.getElementById("se7en-team");
+    const enemyDiv = document.getElementById("enemy-team");
+    se7enDiv.innerHTML = "<h3>SE7EN</h3>";
+    enemyDiv.innerHTML = "<h3>Guards</h3>";
+
+    const player = SE7EN[currentPlayerIndex];
+    if (player && player.hp > 0) {
+      const div = document.createElement("div");
+      div.className = "char";
+      let cd = player.cooldown > 0 ? ` (CD: ${player.cooldown})` : "";
+      div.textContent = `${player.name} - HP: ${player.hp}${cd} ← Your Turn`;
+      div.style.fontWeight = "bold";
+      se7enDiv.appendChild(div);
+    }
+
+    guards.forEach(guard => {
+      const div = document.createElement("div");
+      div.className = "char";
+      div.textContent = `${guard.name} - HP: ${guard.hp} ${guard.stunned ? '(Stunned)' : ''}`;
+      enemyDiv.appendChild(div);
+    });
+
+    document.getElementById("wave").textContent = `Wave: ${wave}/${maxWaves}`;
+  }
+
+  function log(msg) {
+    const logDiv = document.getElementById("battle-log");
+    logDiv.innerHTML += msg + "<br>";
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  function renderActions() {
+    const actionsDiv = document.getElementById("actions");
+    actionsDiv.innerHTML = "";
+
+    const player = SE7EN[currentPlayerIndex];
+    if (!player || player.hp <= 0) {
+      nextTurn();
+      return;
+    }
+
+    const attackBtn = createButton("Attack", () => {
+      const target = guards[Math.floor(Math.random() * guards.length)];
+      target.hp -= player.atk;
+      log(`${player.name} attacks ${target.name} for ${player.atk} damage.`);
+      checkEnemyDefeat();
+      nextTurn();
+    });
+
+    const defendBtn = createButton("Defend", () => {
+      player.defending = true;
+      log(`${player.name} is defending.`);
+      nextTurn();
+    });
+
+    const specialBtn = createButton("Special", () => {
+      if (player.cooldown === 0) {
+        player.cooldown = 3;
+        useSpecial(player);
+        checkEnemyDefeat();
+        nextTurn();
+      }
+    });
+
+    actionsDiv.appendChild(attackBtn);
+    actionsDiv.appendChild(defendBtn);
+    if (player.cooldown === 0) actionsDiv.appendChild(specialBtn);
+  }
+
+  function createButton(label, action) {
+    const btn = document.createElement("button");
+    btn.className = "action-btn";
+    btn.textContent = label;
+    btn.onclick = action;
+    return btn;
+  }
+
+  function useSpecial(player) {
+    const name = player.name;
+    if (name === "Kaden") {
+      const targets = getRandom(guards, 2);
+      targets.forEach(target => {
+        const dmg = player.atk * 2;
+        target.hp -= dmg;
+        log(`Kaden uses Duoshot on ${target.name} for ${dmg} damage!`);
+      });
+    } else if (name === "Kurt") {
+      allDefending = true;
+      const target = guards[Math.floor(Math.random() * guards.length)];
+      target.hp -= 5;
+      log("Iron Guard: Team will take half damage next turn.");
+    } else if (name === "Noah") {
+      SE7EN.forEach(m => {
+        if (m.hp > 0) {
+          m.hp = Math.min(m.maxHp, m.hp + 50);
+        }
+      });
+      log("Reboot Pulse: Team healed +50 HP");
+    } else if (name === "Charlie") {
+      guards.forEach(g => {
+        g.hp -= 10;
+        g.stunned = true;
+      });
+      log("Drone Rush: All enemies take 10 damage and are stunned.");
+    } else if (name === "Sophia") {
+      const target = guards[Math.floor(Math.random() * guards.length)];
+      if (Math.random() < 0.25) {
+        target.hp = 0;
+        log(`Farshot: HEADSHOT on ${target.name}.`);
+      } else {
+        const dmg = Math.floor(target.hp * 0.75);
+        target.hp -= dmg;
+        log(`Farshot: body shot on ${target.name} for ${dmg} damage.`);
+      }
+    } else if (name === "Ava") {
+      guards.forEach(g => g.stunned = true);
+      brainhackTurnsLeft = SE7EN.filter(m => m.hp > 0).length;
+      log("Brainhack: All enemies are stunned.");
+    }
+  }
+
+  function checkEnemyDefeat() {
+    guards = guards.filter(g => g.hp > 0);
+  }
+
+  function checkVictory() {
+    if (guards.length === 0) {
+      wave++;
+      if (wave > maxWaves) {
+        log("<br><strong>TOWER FINISHED</strong>");
+        document.getElementById("actions").innerHTML = "";
+        setTimeout(() => window.location.href = "afterkairo.html", 3000);
+        return true;
+      } else {
+        log(`<br><strong>Wave ${wave} | Team Healed</strong><br>`);
+        healSE7EN();
+        spawnGuards();
+        currentPlayerIndex = 0;
+        renderTeams();
+        renderActions();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function enemyTurn() {
+    guards.forEach(guard => {
+      if (guard.stunned) {
+        log(`${guard.name} is stunned and misses their turn.`);
+        if (brainhackTurnsLeft > 0) {
+          // Don't reduce individual stun
+        } else {
+          guard.stunned = false;
+        }
+        return;
+      }
+      const targets = SE7EN.filter(m => m.hp > 0);
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      if (target) {
+        let dmg = guard.atk;
+        if (target.defending) dmg = Math.floor(dmg / 2);
+        if (allDefending) dmg = Math.floor(dmg / 2);
+        target.hp -= dmg;
+        log(`${guard.name} attacks ${target.name} for ${dmg} damage.`);
+        if (target.hp <= 0) log(`${target.name} has fallen.`);
+      }
+    });
+
+    allDefending = false;
+    SE7EN.forEach(m => {
+      m.defending = false;
+      if (m.cooldown > 0) m.cooldown--;
+    });
+
+    if (SE7EN.every(m => m.hp <= 0)) {
+      log("<br><strong>SE7EN FAILED</strong>");
+      document.getElementById("actions").innerHTML = "";
+      return;
+    }
+
+    currentPlayerIndex = 0;
+    renderTeams();
+    renderActions();
+  }
+
+  function nextTurn() {
+    currentPlayerIndex++;
+    if (brainhackTurnsLeft > 0) brainhackTurnsLeft--;
+    if (checkVictory()) return;
+
+    if (currentPlayerIndex >= SE7EN.length) {
+      enemyTurn();
+    } else {
+      renderTeams();
+      renderActions();
+    }
+  }
+
+  function getRandom(arr, count) {
+    return arr.slice().sort(() => 0.5 - Math.random()).slice(0, count);
+  }
+
+  // Start game
+  spawnGuards();
+  renderTeams();
+  renderActions();
+  </script>
+</body>
+</html>
