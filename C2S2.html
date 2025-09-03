@@ -8,7 +8,7 @@
     body {
       margin: 0;
       background-color: #222;
-      background-image: url('bg_highway.jpg');
+      background-image: url('bg_carday.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -145,8 +145,8 @@
 </head>
 <body>
   <div id="fade-overlay"></div>
-  <div id="title-box">Chapter 2-1<br> <!--Chapter number and part-->
-    Driving to Kairo Tower<br> <!--Title-->
+  <div id="title-box">Chapter 2-2<br> <!--Chapter number and part-->
+    Into the Tower's Reach<br> <!--Title-->
   </div>
   <div id="game-container">
     <div id="textbox">
@@ -169,47 +169,40 @@
 <script>
   const scenes = [
     {
-      character: '',
-      portrait: '',
-      text: `<i>Z3TA's car drives to Kairo Tower, from the distance, they could already see the tower's height.</i>`
-    },
-    {
-      character: '',
-      portrait: '',
-      text: `<i>The crew is preparing for their mission, setting up their equipment.</i>`
-    },      
-    {
-      character: 'Ava',
-      portrait: 'ch_ava.png',
-      text: `<i>Ava's laptop got a notification, a message from their contractor.</i> "The contractor gave us a side note about the mission."`
-    },
-    {
-      character: 'Ava',
-      portrait: 'ch_ava.png',
-      text: `"Every organization's security system was improved" Ava said, reading the message. "Now they have these things called Sentinels guarding the entire building. We need to deal with them."`
-    },
-    {
-      character: 'Charlie',
-      portrait: 'ch_charlie.png',
-      text: `“Sentinels?” Charlie asked from behind the wheel, glancing at her in the rearview mirror. “Like security guards?”`
-    },
-    {
-      character: 'Ava',
-      portrait: 'ch_ava.png',
-      text: `“No,” Ava replied. Her eyes flickered across lines of code, decrypting details. “Automated defense units. Hybrid tech-part drone, part humanoid. They’re armed. They’re smart. Think of them as guard dogs that never sleep.”`
+      character: 'Kaden',
+      portrait: 'ch_kaden.png',
+      text: `“You want me to handle it.”`
     },
     {
       character: 'Kurt',
       portrait: 'ch_kurt.png',
-      text: `Kurt leaned forward, resting his elbows on the back of Charlie’s seat. “If these things are guarding the tower, we’ll need someone who can get in fast, deal with it directly, and not draw the whole floor’s attention.”`
+      text: `“You’re the only one who can,” Kurt admitted. “You’ve got the experience, the reflexes. If anyone can get past it, neutralize it, and open the way for us, it’s you.”`
     },
     {
-      character: 'Noah',
-      portrait: 'ch_noah.png',
-      text: `Noah frowned, adjusting the strap on his medic bag. “That sounds like a one-man task, but also the most dangerous one.”`
+      text: `Kaden didn’t argue. His silence was answer enough. From beside him, Sophia adjusted the strap on her rifle. She didn’t look at him immediately, but her voice carried a sharper edge than usual.`
     },
     {
-      text: `The crew exchanged looks. For a beat, no one spoke. Then all eyes shifted toward **Kaden**, who had been sitting quietly, checking the chambers of his sidearms. He slid one back into its holster and met Kurt’s stare with a steady calm.`
+      character: 'Sophia',
+      portrait: 'ch_sophia.png',
+      text: `“You better not treat this like it’s just another job.”`
+    },
+    {
+      character: 'Kaden',
+      portrait: 'ch_kaden.png',
+      text: `Kaden glanced at her then, his expression unreadable in the shifting streetlight. “I never do.”`
+    },
+    {
+      character: 'Sophia',
+      portrait: 'ch_sophia.png',
+      text: `She finally met his gaze, her jaw tight but her eyes steady. “Just… don’t push too far on your own. We’re a team now. First mission together.”`
+    },
+    {
+      character: 'Kurt',
+      portrait: 'ch_kurt.png',
+      text: 'Kurt nodded. “Then it’s decided. Kaden takes point on the Sentinel.”'
+    },
+    {
+      text: `The car slowed as the tower grew massive in front of them, its shadow swallowing the street. The crew’s mission had begun—together for the first time, but already walking a thin line between trust and risk.`
     }
   ];
 
@@ -256,7 +249,7 @@
     } else {
       fadeOverlay.style.opacity = 1;
       setTimeout(() => {
-        window.location.href = 'C2S2.html';
+        window.location.href = 'A1.html';
       }, 800);
     }
   });

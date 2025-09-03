@@ -1,12 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Launcher</title>
   <style>
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
+    }
+
+    /* === Panorama background (ping-pong) ===
+       - background-size: 200% auto -> gives room to pan horizontally
+       - animate from 0% -> 100% background-position X
+       - 'alternate' makes it go left -> right -> left (ping-pong)
+    */
+    body {
+      background-image: url('bg_hideout.jpg');
+      background-repeat: no-repeat;
+      background-position: 0% 50%;       /* start at left (0%) vertically centered (50%) */
+      background-size: 200% auto;        /* make the bg wider so panning is visible */
+      animation: panBackground 80s ease-in-out infinite alternate;
       height: 100vh;
       background-color: hsl(0, 0%, 0%);
       display: flex;
@@ -14,6 +28,17 @@
       align-items: center;
       font-family: Arial, sans-serif;
       color: white;
+      overflow: hidden; /* keep things tidy while animating */
+    }
+
+    /* vendor prefix for better Safari support */
+    @-webkit-keyframes panBackground {
+      from { background-position: 0% 50%; }
+      to   { background-position: 100% 50%; }
+    }
+    @keyframes panBackground {
+      from { background-position: 0% 50%; }
+      to   { background-position: 100% 50%; }
     }
 
     /* Loading screen */
@@ -23,7 +48,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: hsl(0, 0%, 0%);
+      background-color: rgba(0,0,0,0.95);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -58,7 +83,7 @@
 
     /* Launcher container */
     .container {
-      background-color: hsl(0, 0%, 15%);
+      background-color: rgba(0,0,0,0.55);
       padding: 2rem;
       border-radius: 12px;
       max-width: 600px;
@@ -66,6 +91,8 @@
       margin: 10%;
       text-align: center;
       display: none;
+      z-index: 5;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     }
     button {
       border-radius: 6px;
@@ -78,15 +105,17 @@
     #csShow {
       display: none;
       margin-top: 10px;
+      color: #eee;
     }
   </style>
 </head>
 <body>
   <!-- Hidden audio -->
-  <audio id="menuAudio" src="The Mark Has Been Made.mp3" autoplay loop></audio>
+  <audio id="menuAudio" src="Audio/The Mark Has Been Made.mp3" autoplay loop></audio>
 
   <!-- Loading Screen -->
   <div id="loadingScreen">
+    <div class="spinner" aria-hidden="true"></div>
     <button id="proceedBtn">Proceed to Launcher</button>
   </div>
 
@@ -94,7 +123,7 @@
   <div class="container" id="launcher">
     <h1>I R O N W A K E</h1>
     <h3>v0.8</h3>
-    <a href="PROLOGUE1.html"><button>START IRONWAKE</button></a><br><br>
+    <a href="C0.html"><button>START IRONWAKE</button></a><br><br>
     <button id="chapterBtn">Chapter Select</button>
     <div id="csShow">
       Chapter Select is not recommended unless you want to play <br>
@@ -108,13 +137,16 @@
       <hr>
 
       ACT 1 <br><br>
-      <a href="PROLOGUE1.html"><button>PROLOGUE</button></a>
+      <a href="C0.html"><button>PROLOGUE</button></a>
       <a href="C1S1.html"><button>CHAPTER 1</button></a>
     </div><br>
       <hr>
     <h3>Update Notes</h3>
-    <h4>v0.9</h4>
-    <p>FIRST CHAPTER RELEASE</p>
+    <h4>v0.10</h4>
+    <p>2nd Chapter in Progress <br>
+      Adjustment to page names, added music to chapters <br>
+      More OST to replace placeholder tracks <br>
+      Overhauled launcher</p>
   </div>
 
   <script>
@@ -126,7 +158,7 @@
 
     // Show proceed button after a short delay
     setTimeout(() => {
-      document.getElementById('proceedBtn').style.opacity = 1;
+      proceedBtn.style.opacity = 1;
     }, 1200);
 
     proceedBtn.addEventListener('click', () => {

@@ -145,6 +145,7 @@
   </style>
 </head>
 <body>
+  <audio id="bgm" src="Audio/Stay Away.mp3" loop="loop"></audio>
   <div id="fade-overlay"></div>
   <div id="title-box">Chapter 1 - 4<br>
     Hideout<br>
@@ -162,6 +163,11 @@
   </div>
 
   <script>
+    
+ 
+   window.onload = function() {
+    document.getElementById("bgm").play();
+}
     /*IM SO CLOSE THIS HAS GOT TO WORK BRO*/
     const scenes = [
       {
@@ -255,7 +261,7 @@
       } else {
         fadeOverlay.style.opacity = 1;
         setTimeout(() => {
-          window.location.href = 'launcher.html';
+          window.location.href = 'C2S1.html';
         }, 800);
       }
     });
