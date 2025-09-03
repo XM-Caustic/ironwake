@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IRONWAKE CLIENT</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #222;
+      background-image: url('bg_stairs.jpg') /*Put your background files here*/;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100%;
+      width: 100%;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    #fade-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    #textbox {
+      position: relative;
+      width: 95%;
+      max-width: 800px;
+      margin-bottom: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    #portrait {
+      width: 180px;
+      height: 180px;
+      background-color: #111;
+      margin-right: 15px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
+    }
+
+    /* Compact style if only name is shown */
+    #portrait.name-only {
+      width: auto;
+      height: auto;
+      background: none;
+      margin-right: 15px;
+    }
+
+    #char-name {
+      position: absolute;
+      top: -30px;
+      left: 0;
+      background: #000;
+      padding: 5px 10px;
+      font-weight: bold;
+    }
+
+    #portrait.name-only #char-name {
+      position: static;
+      top: auto;
+      left: auto;
+    }
+
+    #text-content {
+      flex: 1;
+      position: relative;
+    }
+
+    #click-hint {
+      font-size: 0.8em;
+      color: #aaa;
+      margin-top: 10px;
+      display: none;
+    }
+
+    #chapter-box {
+      position: absolute;
+      top: 20px;
+      left: -300px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      transition: left 0.5s ease-in-out;
+      z-index: 10;
+    }
+
+    #chapter-box.show {
+      left: 20px;
+    }
+
+    #title-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      z-index: 10;
+      font-weight: bold;
+    }
+
+    @media screen and (max-width: 600px) {
+      #textbox {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #portrait {
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+
+      #char-name {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+        <audio id="bg-music" autoplay loop>
+    <source src="Audio/Tension.mp3" type="audio/mpeg">
+  </audio>
+  <div id="fade-overlay"></div>
+  <div id="title-box">Chapter 2-3<br> <!--Chapter number and part-->
+    After the First Raid<br> <!--Title-->
+  </div>
+  <div id="game-container">
+    <div id="textbox">
+      <div id="portrait">
+        <div id="char-name"></div>
+      </div>
+      <div id="text-content">
+        <div id="dialogue-text"></div>
+        <div id="click-hint">(Click anywhere in this box to continue...)</div> <!--Clicking continues dialogue-->
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bg-music" loop>
+    <source src="Audio/background.mp3" type="audio/mpeg"> <!--Change this path to your BGM-->
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+  const scenes = [
+      {
+        text: `Gunfire still echoed off the marble walls of Kairo Tower’s upper floors. Shell casings clattered underfoot as the crew pushed forward, cutting through the tower’s security like a blade through cloth. The floor was littered with fallen guards, the air heavy with smoke and the faint sting of burnt powder.` //Character dialogue here
+      },
+      {
+        character: 'Charlie',
+        portrait: 'ch_charlie.png',
+        text: `Charlie ducked behind a toppled desk, reloading. “That’s another squad down. How many more floors do we climb before we hit the vault?”`
+      },
+      {
+        character: 'Kurt',
+        portrait: 'ch_kurt.png',
+        text: `Kurt, keeping his rifle tight to his chest, checked the map Ava had pulled. “Two more levels. Security’s heavier the closer we get. Stay sharp.”`
+      },
+      {
+        text: `Sophia swept her rifle across the hall, her finger easing off the trigger after confirming the silence. Her eyes flicked toward Kaden, who had gone ahead to clear the stairwell. He moved like a shadow, deliberate, his weapons never wavering.`
+      },
+      {
+        text: `Then, a deep metallic roar ripped through the building, rattling the glass panes. The crew froze.`
+      },
+      {
+        character: 'Ava',
+        portrait: 'ch_ava.png',
+        text: `Ava’s laptop let out a piercing alert. “Wait… oh no. That’s not just security detail.” Her voice wavered. “It’s here.”`
+      },
+      {
+        character: 'FIELDMOWER',
+        portrait: 'ch_fieldmower.png',
+        text: `The stairwell doors blasted open. From the smoke emerged FIELDMOWER. A humanoid frame of steel, wings bristling with rotary guns, servos whirring as if it were alive. Its head rotated unnaturally, locking onto the crew with a predator’s precision.`
+      },
+      {
+        character: 'Kurt',
+        portrait: 'ch_kurt.png',
+        text: `“Take cover!” Kurt barked. The hallway exploded with fire as FIELDMOWER unleashed a storm of bullets, shredding walls, splintering cover into dust. The crew scattered, Charlie dragging Ava behind a column, Noah diving to shield himself, Kurt laying down suppressing fire.`
+      }
+    ];
+
+    let index = 0;
+    const charName = document.getElementById('char-name');
+    const portrait = document.getElementById('portrait');
+    const dialogue = document.getElementById('dialogue-text');
+    const clickHint = document.getElementById('click-hint');
+    const fadeOverlay = document.getElementById('fade-overlay');
+    const bgMusic = document.getElementById('bg-music');
+
+    function showScene(i) {
+      const scene = scenes[i];
+      dialogue.innerHTML = scene.text;
+      clickHint.style.display = i === 0 ? 'block' : 'none';
+
+      // Hide portrait & name if both empty
+      if (!scene.character && !scene.portrait) {
+        portrait.style.display = 'none';
+        charName.textContent = '';
+      }
+      // Name but no portrait → compact name box
+      else if (scene.character && !scene.portrait) {
+        portrait.style.display = 'block';
+        portrait.classList.add('name-only');
+        charName.textContent = scene.character;
+        portrait.style.backgroundImage = 'none';
+      }
+      // Normal portrait + name
+      else {
+        portrait.style.display = 'block';
+        portrait.classList.remove('name-only');
+        charName.textContent = scene.character || '';
+        portrait.style.backgroundImage = scene.portrait
+          ? `url('${scene.portrait}')`
+          : 'none';
+      }
+    }
+
+    document.getElementById('textbox').addEventListener('click', () => {
+      // Start music on first click (autoplay restriction bypass)
+      if (bgMusic.paused) {
+        bgMusic.play().catch(err => console.log("Autoplay blocked:", err));
+      }
+
+      index++;
+      if (index < scenes.length) {
+        showScene(index);
+      } else {
+        fadeOverlay.style.opacity = 1; //Fade to black
+        setTimeout(() => {
+          window.location.href = 'yourdestination.html'; //Next scene/page
+        }, 800);
+      }
+    });
+
+    window.addEventListener('load', () => {
+      fadeOverlay.style.opacity = 0; //Fade in from black
+      showScene(index); //Start first scene
+    });
+  </script>
+</body>
+</html>

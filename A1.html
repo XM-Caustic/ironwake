@@ -31,6 +31,7 @@
       text-align: center;
       font-size: 1.2em;
       margin-bottom: 10px;
+      color: black;
     }
 
     .team-section {
@@ -91,13 +92,16 @@
   </style>
 </head>
 <body>
+    <audio id="bg-music" autoplay loop>
+    <source src="Audio/Kairo Tower.wav" type="audio/mpeg">
+  </audio>
   <div class="game-container">
-    <h1>Kairo Tower</h1>
-    <div id="wave">Wave: 1/5</div>
+    <h1 style="background-color: black; color: white;">Kairo Tower</h1>
+    <div id="wave";>Wave: 1/5</div>
 
     <div class="team-section">
       <div class="team" id="se7en-team">
-        <h3>SE7EN</h3>
+        <h3>Z3TA</h3>
       </div>
       <div class="team" id="enemy-team">
         <h3>Guards</h3>
@@ -109,6 +113,12 @@
   </div>
 
   <script>
+        const bgMusic = document.getElementById("bg-music");
+    document.body.addEventListener("click", () => {
+      if (bgMusic.paused) {
+        bgMusic.play();
+      }
+    });
   const maxWaves = 5;
   let wave = 1;
   let currentPlayerIndex = 0;
@@ -142,7 +152,7 @@
   function renderTeams() {
     const se7enDiv = document.getElementById("se7en-team");
     const enemyDiv = document.getElementById("enemy-team");
-    se7enDiv.innerHTML = "<h3>SE7EN</h3>";
+    se7enDiv.innerHTML = "<h3>Z3TA</h3>";
     enemyDiv.innerHTML = "<h3>Guards</h3>";
 
     const player = SE7EN[currentPlayerIndex];
@@ -271,7 +281,7 @@
       if (wave > maxWaves) {
         log("<br><strong>TOWER FINISHED</strong>");
         document.getElementById("actions").innerHTML = "";
-        setTimeout(() => window.location.href = "afterkairo.html", 3000);
+        setTimeout(() => window.location.href = "C2S3.html", 3000);
         return true;
       } else {
         log(`<br><strong>Wave ${wave} | Team Healed</strong><br>`);
@@ -316,7 +326,7 @@
     });
 
     if (SE7EN.every(m => m.hp <= 0)) {
-      log("<br><strong>SE7EN FAILED</strong>");
+      log("<br><strong>Z3TA HAS FAILED</strong>");
       document.getElementById("actions").innerHTML = "";
       return;
     }
