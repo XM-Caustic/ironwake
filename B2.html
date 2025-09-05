@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IRONWAKE CLIENT</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --panel: #0b0b0b;
+      --muted: #1a1a1a;
+      --accent: #2b2b2b;
+      --text: #ffffff;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      font-family: monospace;
+      color: white;
+      background-image: url('bg_stairs.jpg');
+      background-size: 100%;
+    }
+    h3 {
+        background-color: black;
+    }
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      align-items: stretch;
+      justify-content: center;
+      padding: 18px;
+      box-sizing: border-box;
+    }
+    .start, .tutorial {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--text);
+    }
+    .tutorial {
+        background-color: black;
+    }
+    .msg {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+    button {
+      background: var(--panel);
+      color: var(--text);
+      border: none;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      appearance: none;
+      font-family: monospace;
+    }
+    .battle {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .hud {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .unit {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      background: var(--panel);
+    }
+    .unit .name {
+      font-size: 14px;
+    }
+    .hp-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .hpbar {
+      height: 12px;
+      background: var(--muted);
+      flex: 1;
+      position: relative;
+    }
+    .hpfill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 100%;
+      background: var(--accent);
+    }
+    .hptext {
+      font-size: 12px;
+      min-width: 64px;
+      text-align: right;
+    }
+    .log {
+      min-height: 80px;
+      background: var(--panel);
+      padding: 10px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .log p { margin: 0; font-size: 14px; }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 12px 10px;
+      background: var(--muted);
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .end {
+      display: none;
+      padding: 14px;
+      background: var(--panel);
+      text-align: center;
+    }
+    * { user-select: none; }
+    @media(min-width:700px) {
+      .wrap { max-width: 720px; margin: 0 auto; }
+    }
+
+    /* Animations */
+    .fade-out { animation: fadeOut 0.8s forwards; }
+    .fade-in { animation: fadeIn 0.8s forwards; }
+    @keyframes fadeOut { from{opacity:1;} to{opacity:0;} }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+    /* Loss overlay */
+    .loss-overlay {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(255,0,0,0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      opacity: 0;
+      pointer-events: none;
+      flex-direction: column;
+      z-index: 999;
+    }
+    .loss-overlay.show {
+      animation: fadeRed 2s forwards;
+      pointer-events: auto;
+    }
+    @keyframes fadeRed {
+      from { background: rgba(255,0,0,0); opacity: 0; }
+      to { background: rgba(109,0,0,0.85); opacity: 1; }
+    }
+    .retry-btn {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background-color: black;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Start Screen -->
+    <div class="start" id="startScreen">
+      <div class="msg"><h3>TACTICAL ENCOUNTER IN PROGRESS</h3><p style="background-color: black;">[Click READY to begin.]</p></div>
+      <button id="ready">Ready</button>
+    </div>
+
+    <!-- Tutorial Screen -->
+    <div class="tutorial" id="tutorialScreen" style="display:none;">
+      <h3>Battle Tutorial</h3>
+      <p><b>Shoot</b> – Reliable ranged attack (200–300 dmg).</p>
+      <p><b>DuoShot</b> – Two weaker shots (150–250 each).</p>
+      <p><b>Knife</b> – Risky melee strike (300–400 dmg, 50% hit chance).</p>
+      <p><b>Defend</b> – Brace and reduce next damage by 35%.</p>
+      <button id="tutorialOk">Understood</button>
+    </div>
+
+    <!-- Battle UI -->
+    <div class="battle" id="battleUI" aria-hidden="true">
+      <div class="hud">
+        <div class="unit">
+          <div class="name">Kaden</div>
+          <div class="hp-row">
+            <div class="hpbar"><div class="hpfill" id="playerHPfill"></div></div>
+            <div class="hptext" id="playerHPtext">HP</div>
+          </div>
+        </div>
+        <div class="unit">
+          <div class="name">FIELDMOWER</div>
+          <div class="hp-row">
+            <div class="hpbar"><div class="hpfill" id="enemyHPfill"></div></div>
+            <div class="hptext" id="enemyHPtext">HP</div>
+          </div>
+        </div>
+      </div>
+      <div class="log" id="log"><p>Battle initialized.</p></div>
+      <div class="actions" id="actions">
+        <button class="action-btn" data-action="shoot">Shoot</button>
+        <button class="action-btn" data-action="duoshot">DuoShot</button>
+        <button class="action-btn" data-action="knife">Knife</button>
+        <button class="action-btn" data-action="defend">Defend</button>
+        <button class="action-btn" data-action="heal">Heal</button>
+
+      </div>
+      <div class="end" id="endMsg"></div>
+    </div>
+  </div>
+
+  <!-- Loss overlay -->
+  <div class="loss-overlay" id="lossOverlay">
+    <div id="lossText"></div>
+    <button class="retry-btn" id="retryBtn" style="display:none;">Retry</button>
+  </div>
+
+  <!-- Audio -->
+  <audio id="battleAudio" src="Audio/FIELDMOWER.mp3" preload="auto" loop></audio>
+  <audio id="enemyDeathAudio" src="Audio/bossDeath.mp3" preload="auto"></audio>
+
+  <script>
+  const PLAYER_MAX = 5000, ENEMY_MAX = 10000; // FIELDMOWER now has 10,000 HP
+  let player = {hp:PLAYER_MAX,defending:false};
+  let enemy = {hp:ENEMY_MAX};
+
+  let cooldowns = {duoshot:0, heal:0}; // cooldown trackers
+
+  const startScreen=document.getElementById('startScreen');
+  const tutorialScreen=document.getElementById('tutorialScreen');
+  const battleUI=document.getElementById('battleUI');
+  const readyBtn=document.getElementById('ready');
+  const tutorialOk=document.getElementById('tutorialOk');
+  const logEl=document.getElementById('log');
+  const actions=document.getElementById('actions');
+  const endMsg=document.getElementById('endMsg');
+  const audio=document.getElementById('battleAudio');
+  const enemyDeathAudio=document.getElementById('enemyDeathAudio');
+  const playerHPfill=document.getElementById('playerHPfill');
+  const enemyHPfill=document.getElementById('enemyHPfill');
+  const playerHPtext=document.getElementById('playerHPtext');
+  const enemyHPtext=document.getElementById('enemyHPtext');
+  const lossOverlay=document.getElementById('lossOverlay');
+  const lossText=document.getElementById('lossText');
+  const retryBtn=document.getElementById('retryBtn');
+
+  function updateUI(){
+    playerHPfill.style.width=(player.hp/PLAYER_MAX*100)+"%";
+    enemyHPfill.style.width=(enemy.hp/ENEMY_MAX*100)+"%";
+    playerHPtext.textContent=player.hp+" / "+PLAYER_MAX;
+    enemyHPtext.textContent=enemy.hp+" / "+ENEMY_MAX;
+
+    // update buttons with cooldowns
+    document.querySelectorAll(".action-btn").forEach(btn=>{
+      const action=btn.dataset.action;
+      if(cooldowns[action] && cooldowns[action]>0){
+        btn.disabled=true;
+        btn.textContent=action.toUpperCase()+" ("+cooldowns[action]+")";
+      } else {
+        btn.disabled=false;
+        if(action==="duoshot") btn.textContent="DuoShot";
+        else if(action==="heal") btn.textContent="Heal";
+      }
+    });
+  }
+
+  function pushLog(t){logEl.innerHTML='<p>'+t+'</p>'}
+  function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+
+  function playerShoot(){
+    const d=randInt(200,300);
+    enemy.hp-=d;
+    pushLog("Kaden uses Shoot ("+d+")");
+    endOfTurn();
+  }
+
+  function playerDuoShot(){
+    if(cooldowns.duoshot>0){pushLog("DuoShot on cooldown!"); return;}
+    const d1=randInt(150,250), d2=randInt(150,250);
+    enemy.hp-=d1+d2;
+    pushLog("Kaden uses DuoShot ("+(d1+d2)+")");
+    cooldowns.duoshot=2; // 2-turn cooldown
+    endOfTurn();
+  }
+
+  function playerKnife(){
+    if(Math.random()<0.5){
+      const d=randInt(300,400);
+      enemy.hp-=d;
+      pushLog("Kaden stabs ("+d+")");
+    } else pushLog("Knife missed.");
+    endOfTurn();
+  }
+
+  function playerDefend(){
+    player.defending=true;
+    pushLog("Kaden defends.");
+    endOfTurn();
+  }
+
+  function playerHeal(){
+    if(cooldowns.heal>0){pushLog("Heal on cooldown!"); return;}
+    const heal=randInt(600,900);
+    player.hp=Math.min(PLAYER_MAX, player.hp+heal);
+    pushLog("Kaden heals ("+heal+")");
+    cooldowns.heal=3; // 3-turn cooldown
+    endOfTurn();
+  }
+
+  function enemyAttack(){
+    if(enemy.hp<=0)return;
+    let d=randInt(250,300);
+    if(player.defending) d=Math.ceil(d*0.65);
+    player.hp-=d;
+    player.defending=false;
+    pushLog("FIELDMOWER attacks ("+d+")");
+  }
+
+  function scrambleText(txt,el,cb){
+    const chars="!@#$%^&*()_+=-<>?/{}[]";
+    let out=Array(txt.length).fill(""),i=0;
+    const iv=setInterval(()=>{
+      for(let j=0;j<txt.length;j++){
+        out[j]=j<i?txt[j]:chars[Math.floor(Math.random()*chars.length)];
+      }
+      el.textContent=out.join("");
+      if(i++>=txt.length){
+        clearInterval(iv);
+        if(cb)cb();
+      }
+    },80);
+  }
+
+  function fadeOutAudio(a){
+    let f=setInterval(()=>{
+      if(a.volume>0.05){a.volume-=0.05;}
+      else{a.pause();a.volume=1;clearInterval(f);}
+    },200);
+  }
+
+  function checkEnd(){
+    if(enemy.hp<=0){
+      actions.style.display="none";
+      endMsg.style.display="block";
+      endMsg.innerHTML="TACTICAL OVERMATCH<br><button onclick=\"location.href='C2S4.html'\">Continue</button>";
+      pushLog("FIELDMOWER defeated.");
+      fadeOutAudio(audio);
+      enemyDeathAudio.volume=1;
+      enemyDeathAudio.play().catch(()=>{});
+      return true;
+    }
+    if(player.hp<=0){
+      actions.style.display="none";
+      lossOverlay.classList.add("show");
+      fadeOutAudio(audio);
+      scrambleText("TACTICAL MISCALCULATION, RETRY?",lossText,()=>{retryBtn.style.display="block";});
+      retryBtn.onclick=()=>location.reload();
+      return true;
+    }
+    return false;
+  }
+
+  function endOfTurn(){
+    updateUI();
+    setTimeout(()=>{
+      if(checkEnd())return;
+      enemyAttack();
+      // reduce cooldowns after each turn
+      for(let k in cooldowns){if(cooldowns[k]>0) cooldowns[k]--;}
+      updateUI();
+      checkEnd();
+    },400);
+  }
+
+  actions.addEventListener("click",e=>{
+    if(!e.target.dataset.action)return;
+    ({
+      shoot:playerShoot,
+      duoshot:playerDuoShot,
+      knife:playerKnife,
+      defend:playerDefend,
+      heal:playerHeal
+    }[e.target.dataset.action])();
+  });
+
+  readyBtn.onclick=()=>{startScreen.style.display="none";tutorialScreen.style.display="flex";};
+  tutorialOk.onclick=()=>{
+    tutorialScreen.style.display="none";
+    battleUI.style.display="flex";
+    player.hp=PLAYER_MAX;enemy.hp=ENEMY_MAX;
+    updateUI();
+    pushLog("Kaden is ready.");
+    audio.play().catch(()=>{});
+  };
+
+  updateUI();
+</script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>IRONWAKE CLIENT</title>
+  <title>Death of FIELDMOWER</title>
   <style>
     body {
       margin: 0;
@@ -144,12 +144,10 @@
   </style>
 </head>
 <body>
-        <audio id="bg-music" autoplay loop>
-    <source src="Audio/Tension.mp3" type="audio/mpeg">
-  </audio>
   <div id="fade-overlay"></div>
-  <div id="title-box">Chapter 2-3<br> <!--Chapter number and part-->
-    After the First Raid<br> <!--Title-->
+  <div id="title-box">Chapter 2-4<br> <!--Chapter number and part-->
+    The Merc Ghost<br> <!--Title-->
+    August 30, 2012 <!--Date (or anything else if you want)-->
   </div>
   <div id="game-container">
     <div id="textbox">
@@ -164,47 +162,44 @@
   </div>
 
   <!-- Background Music -->
-  <audio id="bg-music" loop>
-    <source src="Audio/background.mp3" type="audio/mpeg"> <!--Change this path to your BGM-->
+  <audio id="bg-music" loop autoplay>
+    <source src="Audio/The Sea.wav" type="audio/mpeg" > <!--Change this path to your BGM-->
     Your browser does not support the audio element.
   </audio>
 
   <script>
   const scenes = [
       {
-        text: `Gunfire still echoed off the marble walls of Kairo Tower’s upper floors. Shell casings clattered underfoot as the crew pushed forward, cutting through the tower’s security like a blade through cloth. The floor was littered with fallen guards, the air heavy with smoke and the faint sting of burnt powder.` //Character dialogue here
+        character: 'Kaden', //Character name here
+        portrait: 'ch_kaden.png', //Character portrait file here
+        text: `<i>Kaden took a sigh of relief, holstering his guns as he pulled his knife out of the FIELDMOWER's head.</i> "After all that, I think I deserve something." <i>He reached down and detached the armed wings of the FIELDMOWER.</i>` //Character dialogue here
       },
       {
-        character: 'Charlie',
-        portrait: 'ch_charlie.png',
-        text: `Charlie ducked behind a toppled desk, reloading. “That’s another squad down. How many more floors do we climb before we hit the vault?”`
+        text: `Kaden has recieved: <i>The FIELDMOWER's Wings</i>`
       },
       {
-        character: 'Kurt',
-        portrait: 'ch_kurt.png',
-        text: `Kurt, keeping his rifle tight to his chest, checked the map Ava had pulled. “Two more levels. Security’s heavier the closer we get. Stay sharp.”`
-      },
+        text: `Can be used in Direct Battles to deal 3x more damage to the target. Select the <i>FIELDMOWER</i> option to use the item.`
+      },      
       {
-        text: `Sophia swept her rifle across the hall, her finger easing off the trigger after confirming the silence. Her eyes flicked toward Kaden, who had gone ahead to clear the stairwell. He moved like a shadow, deliberate, his weapons never wavering.`
-      },
-      {
-        text: `Then, a deep metallic roar ripped through the building, rattling the glass panes. The crew froze.`
-      },
+        character: 'Sophia',
+        portrait: 'ch_sophia.png',
+        text: `<i>Sophia flinched as she watched Kaden brutally tear off the wings of the mech, leaving it on the floor, dead like the others.</i> "That was... Certainly a mission." <i>She sighed.</i> "Are there any more Sentinels in our future raids?" <i>She asked, glaring at Ava.</i>`
+      },      
       {
         character: 'Ava',
         portrait: 'ch_ava.png',
-        text: `Ava’s laptop let out a piercing alert. “Wait… oh no. That’s not just security detail.” Her voice wavered. “It’s here.”`
-      },
-      {
-        character: 'FIELDMOWER',
-        portrait: 'ch_fieldmower.png',
-        text: `The stairwell doors blasted open. From the smoke emerged FIELDMOWER. A humanoid frame of steel, wings bristling with rotary guns, servos whirring as if it were alive. Its head rotated unnaturally, locking onto the crew with a predator’s precision.`
-      },
+        text: `<i>Ava nodded, unlocking the doors to exit Kairo Tower.</i>`
+      },            
       {
         character: 'Kurt',
         portrait: 'ch_kurt.png',
-        text: `“Take cover!” Kurt barked. The hallway exploded with fire as FIELDMOWER unleashed a storm of bullets, shredding walls, splintering cover into dust. The crew scattered, Charlie dragging Ava behind a column, Noah diving to shield himself, Kurt laying down suppressing fire.`
-      }
+        text: `"We better get out of here, before a survivor calls the cops on us." <i>Kurt spoke, recovering from the FIELDMOWER's attack.</i>`
+      },            
+      {
+        character: '',
+        portrait: '',
+        text: `The crew walked out of Kairo Tower and got on Charlie's Getaway vehicle, driving away without any trace.`
+      },            
     ];
 
     let index = 0;
@@ -255,7 +250,7 @@
       } else {
         fadeOverlay.style.opacity = 1; //Fade to black
         setTimeout(() => {
-          window.location.href = 'B2.html'; //Next scene/page
+          window.location.href = 'yourdestination.html'; //Next scene/page
         }, 800);
       }
     });
